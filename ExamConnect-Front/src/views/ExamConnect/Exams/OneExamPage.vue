@@ -60,7 +60,9 @@ export default{
                 }
 
                ],
-               
+                hover:false,
+                currentTime: new Date().toLocaleTimeString(),
+                exam_id: this.$route.query.exam_id,
         }
     },
     mounted() {
@@ -77,34 +79,21 @@ export default{
 <template>
     
   <!-- Page Content -->
-   
+    <div class=" m-2 timer" 
+        @mouseover="hover = true"
+        @mouseleave="hover = false"
+    >
+    <span v-if="!hover" class="timerTitle">Timer </span>
+    <span v-else class="timerValue">{{currentTime}}</span>
+    </div>
     <!-- Hero -->
     <div class="bg-body-light">
         <div class="content content-full">
         <div class="py-3 text-center">
-            <h1 class=" fw-bold mb-2">All Questions</h1>
-        </div>
-        <div class="d-flex justify-content-around">
-              <div>
-                    <!-- search imput -->
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search..">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
-                        </div>
-                </div>
-
-                <div>
-                    <select name="Filter" id="">
-                        <option value="" disabled >Filter</option>
-                        <option value="">QCM</option>
-                        <option value="">Text</option>
-                        <option value="">All</option>
-                    </select>
-                </div>      
+            <h1 class=" fw-bold mb-2">ExamExam TitleTitle</h1>
+            <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+            this exam start in 15:00 and end in 16:00  15/10/2021
+            </h2>
         </div>
         </div>
     </div>
@@ -121,16 +110,16 @@ export default{
                     <h4>1 -what the true Sentence int this three Sentences</h4>
                     <div class="m-5">
                         <div class="m-3">
-                            <input type="checkbox" class="form-check-input  is-valid " checked disabled>
-                            <label class="qst"> a- the first Sentence is true</label>
+                            <input type="checkbox">
+                            <label> the first Sentence is true</label>
                         </div>
                         <div class="m-3">
-                                <input type="checkbox" class="form-check-input  is-invalid " disabled>
-                                <label class="qst">b- the seconde Sentence is true</label>
+                                <input type="checkbox">
+                                <label> the seconde Sentence is true</label>
                         </div>
                         <div class="m-3">
-                                <input type="checkbox" class="form-check-input  is-invalid " disabled>
-                                <label class="qst">c- the third Sentence is true</label>
+                                <input type="checkbox">
+                                <label> the third Sentence is true</label>
                         </div>
                     </div>
             </div>
@@ -144,26 +133,19 @@ export default{
                                     <div style="width: 300px;">
                                         <img style="width: 100%;" src="/assets/media/photos/photo1@2x.jpg" alt="jashdjk">
                                     </div>
-                                    <div class="text-center">
-                                    <input type="checkbox" class="form-check-input  is-valid " checked disabled>
-                                    </div>
-
+                                    <input type="checkbox">
                             </div>
                             <div  class="m-5">
                                     <div style="width: 300px;">
                                         <img style="width: 100%;" src="/assets/media/photos/photo1@2x.jpg" alt="jashdjk">
                                     </div>
-                                    <div class="text-center">
-                                        <input type="checkbox" class="form-check-input  is-invalid  " disabled>
-                                    </div>                            
-                                    </div>
-                            <div  class="m-5 ">
+                                    <input type="checkbox">
+                            </div>
+                            <div  class="m-5">
                                     <div style="width: 300px;">
                                         <img style="width: 100%;" src="/assets/media/photos/photo1@2x.jpg" alt="jashdjk">
                                     </div>
-                                    <div class="text-center">
-                                        <input type="checkbox" class="form-check-input  is-invalid  " disabled>
-                                    </div>
+                                    <input type="checkbox">
                             </div>
                     </div>
             </div>
@@ -176,8 +158,8 @@ export default{
             <!-- creating the Question body -->
             <h4>1 -Answer this question by writing a the Answear</h4>
             <div class="m-5">
-                <textarea name="" id="" cols="100" rows="4" value="This is the perfect answer of the question" readonly> 
-           
+                <textarea name="" id="" cols="100" rows="4">
+                    
                 </textarea>
             </div>
               
@@ -190,16 +172,24 @@ export default{
   <!-- END Page Content -->
 </template>
 
-<style>
 
-.form-check-input{
-    width: 25px;
-    height: 25px;
-    margin-right: 20px;
+<style>
+.timer {
+    width: 80px;
+    background-color: #f5f5f5;
+    border: red 3px solid;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 255px;
+    transition: all 0.3s ease; /* Add a transition for a smooth effect */
 }
-.qst{
-    font-size: 16px ;
-    font-weight: 600;
-    margin-top: 5px; 
-}
+
 </style>

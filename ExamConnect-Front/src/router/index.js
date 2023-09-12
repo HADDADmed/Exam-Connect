@@ -258,6 +258,7 @@ const Error503 = () => import("@/views/errors/503View.vue");
 const ExamConnectDashboard = () => import("@/views/examconnect/DashboardView.vue");
 const CreateExam = () => import("@/views/examconnect/Exams/CreateExam.vue");
 const ExamsList = () => import("@/views/examconnect/Exams/ExamsList.vue");
+const OneExamPage = () => import("@/views/examconnect/Exams/OneExamPage.vue");
 const Authentication = () => import("@/views/examconnect/Auth/AuthenticationPage.vue");
 const CreateQuestion= () => import("@/views/examconnect/Questions/CreateQuestion.vue");
 const QuestionsList = () => import("@/views/examconnect/Questions/QuestionsList.vue");
@@ -307,6 +308,10 @@ const routes = [
         path: "exams/examconnect-exams-create",
         name: "examconnect-exams-create",
         component: CreateExam,
+      },{
+        path: "exams/examconnect-exams-exam",
+        name: "examconnect-exams-exam",
+        component: OneExamPage,
       },{
         path: "questions/examconnect-questions-list",
         name: "examconnect-questions-list",

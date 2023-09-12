@@ -47,7 +47,7 @@ export default {
           to: "examconnect-questions-list",
           icon: "si si-list",
         },{
-          name: "Create Exam",
+          name: "Create Question",
           to: "examconnect-questions-create",
           icon: "si si-plus",
         },
