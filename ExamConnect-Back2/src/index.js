@@ -38,6 +38,9 @@ connection.connect(function (err) {
 
 
 
+//make the public folder available to the public
+app.use('/public', express.static('public'));
+
 
 app.use("/api/questions", require("./routers/Questions.router"));
 app.use("/api/users", require("./routers/users.router"));

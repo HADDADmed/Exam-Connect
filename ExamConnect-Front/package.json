@@ -19,6 +19,7 @@
     "not Explorer <= 11"
   ],
   "dependencies": {
+    "@braid/vue-formulate": "^2.5.3",
     "@chenfengyuan/vue-countdown": "^2.1.1",
     "@ckeditor/ckeditor5-build-balloon": "^38.1.0",
     "@ckeditor/ckeditor5-build-balloon-block": "^38.1.0",
@@ -42,8 +43,12 @@
     "@vuelidate/validators": "^2.0.3",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.0",
+    "bootstrap4-toggle": "^3.6.1",
+    "bootstrap5-toggle": "^5.0.4",
     "chart.js": "^4.3.0",
     "dropzone": "^6.0.0-beta.2",
+    "filepond": "^4.30.4",
+    "filepond-plugin-image-preview": "^4.6.11",
     "highlight.js": "^11.8.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.4",
@@ -54,6 +59,7 @@
     "vue-cropperjs": "^5.0.0",
     "vue-dataset": "^3.5.4",
     "vue-easy-lightbox": "^1.16.0",
+    "vue-filepond": "^7.0.3",
     "vue-flatpickr-component": "^11.0.3",
     "vue-router": "^4.2.2",
     "vue-select": "^4.0.0-beta.3",

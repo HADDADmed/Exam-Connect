@@ -5,22 +5,23 @@ import App from "./App.vue";
 // You can use the following starter router instead of the default one as a clean starting point
 // import router from "./router/starter";
 import router from "./router";
-
-// Template components
-import BaseBlock from "@/components/BaseBlock.vue";
-import BaseBackground from "@/components/BaseBackground.vue";
-import BasePageHeading from "@/components/BasePageHeading.vue";
-
-// Template directives
-import clickRipple from "@/directives/clickRipple";
-
-// Bootstrap framework
-import * as bootstrap from "bootstrap";
-window.bootstrap = bootstrap;
-
-// Craft new application
-const app = createApp(App);
-
+ 
+ // Template components
+ import BaseBlock from "@/components/BaseBlock.vue";
+ import BaseBackground from "@/components/BaseBackground.vue";
+ import BasePageHeading from "@/components/BasePageHeading.vue";
+ 
+ // Template directives
+ import clickRipple from "@/directives/clickRipple";
+ 
+ // Bootstrap framework
+ import * as bootstrap from "bootstrap";
+ window.bootstrap = bootstrap;
+ 
+ // Craft new application
+ const app = createApp(App);
+ 
+ 
 // Register global components
 app.component("BaseBlock", BaseBlock);
 app.component("BaseBackground", BaseBackground);
