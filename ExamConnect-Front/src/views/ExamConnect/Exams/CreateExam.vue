@@ -1,12 +1,27 @@
 <script>
+
+import ExamsService from '../../../services/exams.service';
   export default {
   data() {
-    return {      
+    return {  
+        exam:{
+          examTitle:"",
+            startTime:"",
+            endTime:"",
+            questions:{
+                qcmQuestions:0,
+                textQuestions:0,
+                imageQuestions:0,
+            }
+        }    
     }
   },
   methods: {   
     save() {
-      console.log("save");
+
+        ExamsService.createExam(this.exam)
+        console.log("created successfuly");
+      console.log("to other page@!");
     },
   },
   components: {
@@ -39,51 +54,53 @@
 
                     <div>
                         <div >
-                    <div class="form-floating mb-4 col-10 animated bounceInDown">
+                    <div class="form-floating mb-4 col-12 animated bounceInDown">
                          <input
                               type="text"
                               class="form-control form-control-alt border border-primary"
                               id="example-text-input-floating"
                               name="example-text-input-floating"
-                              placeholder="John Doe"
-                          />
+                              v-model="exam.examTitle"
+                           />
                          <label for="example-text-input-floating">Title</label>
                     </div>
                     <div class="d-flex justify-content-start" >
-                                <div class= " mb-4 col-5  mb-4 ">
+                                <div class= " mb-4 col-6  mb-4 ">
                                 <label class="form-label mb-2" for="startTime"
                                 >Start Time:</label
-                                >
+                                > 
                                 <input
                                 type="datetime-local"
-                                class="form-control mb-4 col-4 animated form-control-alt border border-danger bounceInLeft"
+                                class="form-control mb-4 col-6 animated form-control-alt border border-danger bounceInLeft"
                                 id="startTime"
+                                v-model="exam.startTime"
                                 />
                             </div>
-                            <div class="  mb-4 col-5  mb-4">
+                            <div class="  mb-4 col-6  mb-4">
                                 <label class="form-label mb-2" for="date_heure_fin"
                                 >End Time :</label
                                 >
                                 <input
                                 type="datetime-local"
-                                class="form-control mb-4 col-4 form-control-alt border border-danger animated bounceInRight"
+                                class="form-control mb-4 col-6 form-control-alt border border-danger animated bounceInRight"
+                                v-model="exam.endTime"
                                 />
                             </div>
                     </div>
 
                     <!-- Questions count -->
-                    <div class="d-flex">
-                        <div class="badge bg-primary">
+                    <div class="d-flex justify-content-center">
+                        <div class="badge bg-primary m-2">
                             115 QCM Questions
                         </div>
-                        <div class="badge bg-primary">
+                        <div class="badge bg-primary m-2">
                             115 Text Questions
                         </div>
-                        <div class="badge bg-primary">
+                        <div class="badge bg-primary m-2">
                             115 Images Questions
                         </div>
                     </div>
-                    <div class="d-flex">
+                    <div class="d-flex m-5 justify-content-center" >
                         <div class="d-flex ">
                            <div style="margin-right: 20px;   margin-top: 5px;">
                                <strong> QCM Questions :</strong>
@@ -92,7 +109,8 @@
                                 <input 
                                 type="number"
                                 class="form-control form-control-alt form-control   border border-success animated bounceInRight"
-                                
+                                  min="1"  
+                                v-model="exam.questions.qcmQuestions"
                                 >
                            </div>
                         </div>
@@ -105,24 +123,37 @@
                                 <input 
                                 type="number"
                                 class="form-control form-control-alt form-control   border border-success animated bounceInRight"
-                                
+                                 min="1"
+                                v-model="exam.questions.textQuestions"
                                 >
                            </div>
                         </div>
 
                         <div class="d-flex ">
                             <div style="margin-right: 20px;   margin-top: 5px;">
-                            <strong>Images Questions :</strong>
+                            <strong>Image Questions :</strong>
                             </div>
                             <div class=" mb-4 col-2 ">
                                 <input 
                                 type="number"
                                 class="form-control form-control-alt form-control   border border-success animated bounceInRight"
-                                
+                                  min="1"
+                                v-model="exam.questions.imageQuestions"
                                 >
                            </div>
                         </div>
                         
+                    </div>
+                    <div style="margin-top: -50px;" class="d-flex justify-content-center">
+                        <div class="badge bg-success m-2">
+                            {{exam.questions.qcmQuestions}}  QCM Questions
+                        </div>
+                        <div class="badge bg-success m-2">
+                            {{ exam.questions.textQuestions }}  Text Questions
+                        </div>
+                        <div class="badge bg-success m-2">
+                            {{ exam.questions.imageQuestions }}  Images Questions
+                        </div>
                     </div>
                      
                </div>
@@ -131,8 +162,9 @@
 
                    
                </div>
-               <div class="d-flex justify-content-center mb-4">
+               <div style="margin-top: 30px;" class="d-flex justify-content-center mb-4">
                     <button
+                            @click="save()"
                           class="btn btn-lg rounded-pill btn-success"
                     >
                          Save

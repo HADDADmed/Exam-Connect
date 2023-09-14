@@ -10,6 +10,7 @@ import router from "./router";
  import BaseBlock from "@/components/BaseBlock.vue";
  import BaseBackground from "@/components/BaseBackground.vue";
  import BasePageHeading from "@/components/BasePageHeading.vue";
+ import GlobalService from "@/services/global.service";
  
  // Template directives
  import clickRipple from "@/directives/clickRipple";
@@ -21,7 +22,7 @@ import router from "./router";
  // Craft new application
  const app = createApp(App);
  
- 
+
 // Register global components
 app.component("BaseBlock", BaseBlock);
 app.component("BaseBackground", BaseBackground);
@@ -33,6 +34,11 @@ app.directive("click-ripple", clickRipple);
 // Use Pinia and Vue Router
 app.use(createPinia());
 app.use(router);
+
+
+app.config.globalProperties.globalService = GlobalService
+
+
 
 // ..and finally mount it!
 app.mount("#app");

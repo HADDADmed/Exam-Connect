@@ -1,34 +1,41 @@
-<script setup>
-import { ref } from "vue";
+<script>
+import ExamsService from "../../../services/exams.service";
+export default {
+  data() {
+    return {
+      bgClass: ["bg-city","bg-flat","bg-amethyst","bg-smooth","bg-default","bg-modern","bg-warning","bg-success","bg-info","bg-danger","bg-gray-dark","bg-primary",],
+      exams: [],
+    };
+  },
+  mounted() {
+    ExamsService.getAllExams().then((response) => {
+      const examsCustom = response.data.map((exam) => {
+        const startTime = new Date(exam.startTime);
+        const endTime = new Date(exam.endTime);
 
-const bgClass = ref([
-  "bg-city",
-  "bg-flat",
-  "bg-amethyst",
-  "bg-smooth",
-  "bg-default",
-  "bg-modern",
-  "bg-warning",
-  "bg-success",
-  "bg-info",
-  "bg-danger",
-  "bg-gray-dark",
-  "bg-primary",
-]);
+        // Calculate the time difference in milliseconds
+        const timeDifference = endTime - startTime;
+        // Convert milliseconds to hours and minutes
+        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+        const minutes = Math.floor(
+          (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+        );
 
- const os = ref([
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-
- ])
-
+        const examDuration = `${hours} hours ${minutes} minutes`;
+        return {
+          ...exam,
+          qcmQuestions: exam.questions.filter((q) => q.isQcm === 1).length,
+          textQuestions: exam.questions.filter((q) => q.isQcm === 0).length,
+          imageQuestions: exam.questions.filter((q) => q.isQcm === 2).length,
+          createdAt: new Date(exam.createdAt).toLocaleDateString(),
+          examDuration: examDuration,
+        };
+      });
+      console.log(examsCustom);
+      this.exams = examsCustom;
+    });
+  },
+};
 </script>
 
 <template>
@@ -50,13 +57,15 @@ const bgClass = ref([
   <div class="content content-boxed">
     <div class="row items-push py-4">
       <!-- Course -->
-      <div v-for="o in os " class="col-md-6 col-lg-4 col-xl-3">
-         
+      <div v-for="exam in exams" class="col-md-6 col-lg-4 col-xl-3">
         <RouterLink
-              :to="{ name: 'examconnect-exams-exam', query: { exam_id: 10} }"
-              custom
-              v-slot="{ href, navigate }"
-            >
+          :to="{
+            name: 'examconnect-exams-exam',
+            query: { exam_id: exam.exam_id },
+          }"
+          custom
+          v-slot="{ href, navigate }"
+        >
           <BaseBlock
             :href="href"
             @click="navigate"
@@ -66,32 +75,35 @@ const bgClass = ref([
           >
             <template #content>
               <div
-               class="block-content block-content-full text-center"
-               :class="bgClass[Math.floor(Math.random() * bgClass.length)]"
-               
-               >
+                class="block-content block-content-full text-center"
+                :class="bgClass[Math.floor(Math.random() * bgClass.length)]"
+              >
                 <div
-                style="font-size: 40px;  "
+                  style="font-size: 40px"
                   class="item item-2x item-circle bg-white-10 py-3 my-3 mx-auto"
                 >
-                <h5 style="margin-top: 20px;"><strong>18</strong> users Answer</h5>                
+                  <h5 style="margin-top: 20px">
+                    <strong>18</strong> users Answer
+                  </h5>
                 </div>
-                <div class="fs-sm text-white-75">10 Questions &bull; 3 hours</div>
+                <div class="fs-sm text-white-75">
+                  {{ exam.questionsCount }} Questions &bull;
+                  {{ exam.examDuration }}
+                </div>
               </div>
               <div class="block-content block-content-full">
-                <h4 class="h5 mb-1">
-                  Title of the exam ...
-                </h4>
-                <div class="fs-sm text-muted">15-10-2023</div>
+                <h4 class="h5 mb-1">{{exam.ExamTitle}}</h4>
+                <div class="fs-sm text-muted">{{exam.createdAt}}</div>
+                <div style="font-size: large"><strong>{{exam.qcmQuestions}} </strong> QCM Questions</div>
+                <div style="font-size: large"><strong>{{ exam.textQuestions}} </strong> Text Questions</div>
+                <div style="font-size: large"><strong>{{exam.imageQuestions}} </strong> Image Questions</div>
               </div>
             </template>
           </BaseBlock>
         </RouterLink>
       </div>
       <!-- END Course -->
- 
     </div>
   </div>
   <!-- END Page Content -->
- 
 </template>

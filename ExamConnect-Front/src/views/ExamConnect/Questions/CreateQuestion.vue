@@ -1,6 +1,7 @@
 <script>
 import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 export default {
   data() {
     return {
@@ -14,7 +15,7 @@ export default {
         qstOptionCounter: 1,
         qstOptions: [
           {
-            qstOption: "",
+            qstText: "",
             isTrue: false,
           },
         ],
@@ -34,18 +35,16 @@ export default {
   methods: {
     addQstOption() {
       this.question.qstOptions.push({
-        qstOption: "",
+        qstText: "",
         isTrue: false,
       });
     },
     addQstImage() {
       this.question.qstImages.push({
-        qstOption: "",
+        qstText: "",
         isTrue: false,
         preview: null,
         image: null,
-        preview_list: [],
-        image_list: [],
       });
     },
     saveQst() {
@@ -62,28 +61,20 @@ export default {
         reader.readAsDataURL(input.files[0]);
       }
     },
-    previewMultiImage(event, i) {
-      var input = event.target;
-      var count = input.files.length;
-      var index = 0;
-      if (input.files) {
-        while (count--) {
-          var reader = new FileReader();
-          reader.onload = (e) => {
-            this.question.qstImages[i].preview_list.push(e.target.result);
-          };
-          this.question.qstImages[i].image_list.push(input.files[index]);
-          reader.readAsDataURL(input.files[index]);
-          index++;
-        }
-      }
-    },
-    reset() {
-      for (let i = 0; i < this.question.qstImages.length; i++) {
-        this.question.qstImages[i].preview = null;
-        this.question.qstImages[i].image = null;
-        this.question.qstImages[i].preview_list = [];
-        this.question.qstImages[i].image_list = [];
+    reset(index=null) {
+        if(index != null){
+            this.question.qstImages[index].preview = null;
+            this.question.qstImages[index].image = null;
+            this.question.qstImages[index].preview_list = [];
+            this.question.qstImages[index].image_list = [];
+          }
+      else {
+            for (let i = 0; i < this.question.qstImages.length; i++) {
+            this.question.qstImages[i].preview = null;
+            this.question.qstImages[i].image = null;
+            this.question.qstImages[i].preview_list = [];
+            this.question.qstImages[i].image_list = [];
+         }
       }
     },
   },
@@ -254,7 +245,7 @@ export default {
                             @change="previewImage($event, index)"
                           />
                         </div>
-
+                            
                         <div
                           class="btn btn-secondary text-center rounded rounded-circle m-3"
                           style="width: 50px; height: 50px"
@@ -270,6 +261,12 @@ export default {
                             aria-hidden="true"
                           ></i>
                         </div>
+                        <button
+                              class="btn btn-secondary rounded rounded-pill"
+                              @click="reset(index)"
+                            >
+                              Clear  
+                            </button>
                       </div>
 
 
@@ -312,7 +309,7 @@ export default {
                 <ckeditor
                   :editor="ClassicEditor"
                   :config="editorConfig"
-                  v-model="question.qstOptions[index].qstOption"
+                  v-model="question.qstOptions[index].qstText"
                 />
               </div>
 

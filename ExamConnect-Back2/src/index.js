@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require("cors"); // Import the cors package
 // Add Access Control Allow Origin headers
-const allowedOrigins = ['http://localhost:3000/','http://192.168.1.107:5173', 'http://localhost:5173','http://localhost:5173'];
+const allowedOrigins = ['http://localhost:3000/','http://192.168.1.107:5173', 'http://localhost:5173'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
