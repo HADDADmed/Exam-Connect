@@ -1,5 +1,5 @@
 <script>
-import ExamsService from '../../../services/exams.service';
+import ExamsService from "../../../services/exams.service";
 export default {
   data() {
     return {
@@ -80,7 +80,7 @@ export default {
       ],
       exam_id: this.$route.query.exam_id,
       hover: false,
-      exam:{},
+      exam: {},
       currentTime: new Date().toLocaleTimeString(),
     };
   },
@@ -107,10 +107,13 @@ export default {
   <div class="bg-body-light">
     <div class="content content-full">
       <div class="py-3 text-center">
-        <h1 class="fw-bold mb-2">{{exam.ExamTitle}}</h1>
+        <h1 class="fw-bold mb-2">{{ exam.ExamTitle }}</h1>
         <h2 class="fs-base lh-base fw-medium text-muted mb-0">
-         <!-- display the time string version -->
-         this exam will start at {{ globalService.getTime(exam.startTime) }} and will end at {{ globalService.getTime(exam.endTime) }} in {{ globalService.getDate(exam.startTime) }}
+          <!-- display the time string version -->
+          this exam will start at
+          {{ globalService.getTimeWithoutSeconds(exam.startTime) }} and will end
+          at {{ globalService.getTimeWithoutSeconds(exam.endTime) }} in
+          {{ globalService.getDate(exam.startTime) }}
         </h2>
       </div>
     </div>
@@ -120,56 +123,81 @@ export default {
     <!-- Dummy content -->
     <div v-for="(question, index) in exam.questions" class="col-12">
       <BaseBlock v-if="question.isQcm">
-        <div v-if="question.isQcm == 1">
-          <h2 class="content-heading">Question {{ index }} :</h2>
+        <div v-if="question.isQcm === 1">
+          <h2 class="content-heading">Question {{ index +1 }} :</h2>
           <!-- creating the Question body -->
-          <h4>{{question.question_text}}</h4>
+          <h4>{{ question.question_text }}</h4>
           <div class="m-5">
-            <div v-for="(option,index2) in question.options" class="m-3">
-              <input type="checkbox"  />
-              <label>{{ option.question_text }}</label>
+            <div v-for="(option, index2) in question.options" class="m-3">
+              <div class="m-3">
+                <input
+                  type="radio"
+                  class="form-check-input"
+                  :id="'option_' + option.id"
+                  :name="'question_' + index"
+                  :value="option.id"
+                />
+                <label class="qst" :for="'option_' + option.id"> <strong style="font-size: 18px;"> {{ index2 + 1 }} -</strong> {{
+                  option.option_question_text
+                }}</label>
+              </div>
             </div>
-             
           </div>
         </div>
 
         <div v-else>
-          <h2 class="content-heading">Question 1</h2>
           <!-- creating the Question body -->
-          <h4>1 -chose the Logic image</h4>
+          <h2 class="content-heading">Question {{ index +1 }} :</h2>
+          <h4>{{ question.question_text }}</h4>
           <div class="d-flex">
-            <!-- <div v-for="n in o.images">
+            <div v-for="(option, index2) in question.options">
               <div class="m-5">
                 <div class="form-check form-block">
                   <input
                     type="radio"
                     class="form-check-input"
-                    :id="'example-radio-block' + n.id"
-                    :name="'example-radio-block-group-' + o.id"
+                    :id="'example-radio-block' + option.id"
+                    :name="'example-radio-block-group-' + question.id"
                   />
                   <label
                     class="form-check-label"
-                    :for="'example-radio-block' + n.id"
+                    :for="'example-radio-block' + option.id"
                   >
                     <span class="d-block fw-normal text-center my-3">
                       <div style="width: 100%">
-                        <img style="width: 100%" :src="n.url" alt="jashdjk" />
+                        <img
+                          style="width: 100%"
+                          :src="option.option_question_text"
+                          alt="image"
+                        />
                       </div>
                     </span>
                   </label>
                 </div>
               </div>
-            </div> -->
+            </div>
           </div>
         </div>
       </BaseBlock>
 
       <BaseBlock v-else>
-        <h2 class="content-heading">Question 8</h2>
-        <!-- creating the Question body -->
-        <h4>1 -Answer this question by writing a the Answear</h4>
-        <div class="m-5">
-          <textarea name="" id="" cols="100" rows="4"> </textarea>
+        <!-- Creating the Question body -->
+        <h2 class="content-heading">Question {{ index +1 }} :</h2>
+        <h4 class="mb-4">{{ question.question_text }}</h4>
+        <div class="container m-5">
+          <div class="row">
+            <div class="col-md-11 ">
+              <div class="form-group">
+                <textarea
+                  style="border:  1px solid black;" 
+                  class="form-control form-control-alt"
+                  rows="4"
+                  placeholder="Enter your answer here..."
+                  v-model="userAnswer"
+                ></textarea>
+              </div>
+            </div>
+          </div>
         </div>
       </BaseBlock>
     </div>
@@ -196,5 +224,15 @@ export default {
   position: fixed;
   top: 255px;
   transition: all 0.3s ease; /* Add a transition for a smooth effect */
+}
+.form-check-input {
+  width: 25px;
+  height: 25px;
+  margin-right: 20px;
+}
+.qst {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 5px;
 }
 </style>
