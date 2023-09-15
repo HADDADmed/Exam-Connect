@@ -14,15 +14,24 @@ class GlobalService {
         const hours = date.getHours();
         const minutes = date.getMinutes();
         const seconds = date.getSeconds();
+        if(seconds<10 && minutes<10)
+        return `${hours}:0${minutes}:0${seconds}`;
+        else if(seconds<10)
+        return `${hours}:${minutes}:0${seconds}`;
+        else if(minutes<10)
+        return `${hours}:0${minutes}:${seconds}`;
+        else
         return `${hours}:${minutes}:${seconds}`;
-
-
     }
     getTimeWithoutSeconds(date1) {
         const date = new Date(date1);
         const hours = date.getHours();
         const minutes = date.getMinutes();
+        if(minutes<10)
+        return `${hours}:0${minutes}`;
+        else
         return `${hours}:${minutes}`;
+        
     }
 
     getDate(date1) {
@@ -30,8 +39,15 @@ class GlobalService {
         const year = date.getFullYear();
         const month = date.getMonth();
         const day = date.getDate();
-        return `${year}-${month}-${day}`;
-    }
+        if(day<10 && month<10)
+        return `0${day}-0${month}-${year}`;
+        else if(day<10)
+        return `0${day}-${month}-0${year}`;
+        else if(month<10)
+        return `${day}-0${month}-${year}`;
+        else
+        return `${day}-${month}-${year}`;
+     }
 
     getfullDateTime(date1) {
         const date = new Date(date1);
@@ -41,8 +57,8 @@ class GlobalService {
         const hours = date.getHours();
         const minutes = date.getMinutes();
         const seconds = date.getSeconds();
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    }
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+        }
 
 
 
