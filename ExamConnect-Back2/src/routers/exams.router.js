@@ -122,16 +122,16 @@ router.get("/exam/:id", (req, res) => {
             Exam.endTime,
             Exam.createdAt,
             question.id AS question_id, 
-            question.question_text,
+            question.question_text ,
             question.isQcm,
             qo.id AS option_id,
-            qo.question_text,
+            qo.question_text AS option_question_text,
             qo.isTrue
             
             FROM Exam 
             INNER JOIN exam_question ON Exam.id = exam_question.exam_id
             INNER JOIN question ON exam_question.question_id = question.id
-            INNER JOIN questionoption AS qo ON question.id = qo.question_id
+            LEFT  JOIN questionoption AS qo ON question.id = qo.question_id
             WHERE Exam.id = ?;
     `;
     
@@ -146,6 +146,7 @@ router.get("/exam/:id", (req, res) => {
         res.status(404).json({ message: "Exam not found" });
 
           } else{
+
             const exam = {
               exam_id: results[0].exam_id,
               ExamTitle: results[0].ExamTitle,
@@ -167,7 +168,7 @@ router.get("/exam/:id", (req, res) => {
                   options: [
                     {
                       id: row.option_id,
-                      question_text: row.question_text,
+                      option_question_text: row.option_question_text,
                       isTrue: row.isTrue,
                     },
                   ],
@@ -175,11 +176,19 @@ router.get("/exam/:id", (req, res) => {
               } else {
                 existingQuestion.options.push({
                   id: row.option_id,
-                  question_text: row.question_text,
+                  option_question_text: row.option_question_text,
                   isTrue: row.isTrue,
                 });
               }
             });
+
+            // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
+
+            const qcmQuestions = exam.questions.filter((question) => question.isQcm === 1);
+            const textQuestions = exam.questions.filter((question) => question.isQcm === 0);
+            const imageQuestions = exam.questions.filter((question) => question.isQcm === 2);
+            exam.questions = qcmQuestions.concat(textQuestions, imageQuestions);
+            
             res.status(200).json(exam);
           }
     }
