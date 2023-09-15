@@ -96,13 +96,9 @@ export default {
 };
 </script>
 
-
 <template>
   <!-- Page Content -->
-  <div class="m-2 timer" @mouseover="hover = true" @mouseleave="hover = false">
-    <span v-if="!hover" class="timerTitle">Timer </span>
-    <span v-else class="timerValue">{{ currentTime }}</span>
-  </div>
+
   <!-- Hero -->
   <div class="bg-body-light">
     <div class="content content-full">
@@ -110,7 +106,7 @@ export default {
         <h1 class="fw-bold mb-2">{{ exam.ExamTitle }}</h1>
         <h2 class="fs-base lh-base fw-medium text-muted mb-0">
           <!-- display the time string version -->
-          this exam will start at
+          this exam start at
           {{ globalService.getTimeWithoutSeconds(exam.startTime) }} and will end
           at {{ globalService.getTimeWithoutSeconds(exam.endTime) }} in
           {{ globalService.getDate(exam.startTime) }}
@@ -124,7 +120,7 @@ export default {
     <div v-for="(question, index) in exam.questions" class="col-12">
       <BaseBlock v-if="question.isQcm">
         <div v-if="question.isQcm === 1">
-          <h2 class="content-heading">Question {{ index +1 }} :</h2>
+          <h2 class="content-heading">Question {{ index + 1 }} :</h2>
           <!-- creating the Question body -->
           <h4>{{ question.question_text }}</h4>
           <div class="m-5">
@@ -133,13 +129,17 @@ export default {
                 <input
                   type="radio"
                   class="form-check-input"
+                  :class="option.isTrue ? 'is-valid' : 'is-invalid'"
                   :id="'option_' + option.id"
                   :name="'question_' + index"
+                  :checked="option.isTrue"
                   :value="option.id"
+                  disabled
                 />
-                <label class="qst" :for="'option_' + option.id"> <strong style="font-size: 18px;"> {{ index2 + 1 }} -</strong> {{
-                  option.option_question_text
-                }}</label>
+                <label class="qst" :for="'option_' + option.id" >
+                  <strong style="font-size: 18px"> {{ index2 + 1 }} -</strong>
+                  {{ option.option_question_text }}
+                </label>
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default {
 
         <div v-else>
           <!-- creating the Question body -->
-          <h2 class="content-heading">Question {{ index +1 }} :</h2>
+          <h2 class="content-heading">Question {{ index + 1 }} :</h2>
           <h4>{{ question.question_text }}</h4>
           <div class="d-flex">
             <div v-for="(option, index2) in question.options">
@@ -156,8 +156,11 @@ export default {
                   <input
                     type="radio"
                     class="form-check-input"
+                    :class="option.isTrue ? 'is-valid' : 'is-invalid'"
                     :id="'example-radio-block' + option.id"
                     :name="'example-radio-block-group-' + question.id"
+                    :checked="option.isTrue"
+                    disabled
                   />
                   <label
                     class="form-check-label"
@@ -181,25 +184,11 @@ export default {
       </BaseBlock>
 
       <BaseBlock v-else>
-        <!-- Creating the Question body -->
-        <h2 class="content-heading">Question {{ index +1 }} :</h2>
-        <h4 class="mb-4">{{ question.question_text }}</h4>
-        <div class="container m-5">
-          <div class="row">
-            <div class="col-md-11 ">
-              <div class="form-group">
-                <textarea
-                  style="border:  1px solid black;" 
-                  class="form-control form-control-alt"
-                  rows="4"
-                  placeholder="Enter your answer here..."
-                  v-model="userAnswer"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </BaseBlock>
+      <!-- Creating the Question body -->
+      <h2 class="content-heading">Question {{ index + 1 }} :</h2>
+      <h4 class="mb-4" v-html="question.question_text"></h4>
+    </BaseBlock>
+
     </div>
     <!-- END Dummy content -->
   </div>

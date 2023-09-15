@@ -1,40 +1,14 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
-import { useTemplateStore } from "@/stores/template";
+ import { useTemplateStore } from "@/stores/template";
+ 
 
 // Grab example data
 import notifications from "@/data/notifications";
 
-// Main store and Router
+
 const store = useTemplateStore();
-const router = useRouter();
-
-// Reactive variables
-const baseSearchTerm = ref("");
-
-// On form search submit functionality
-function onSubmitSearch() {
-  router.push("/backend/pages/generic/search?" + baseSearchTerm.value);
-}
-
-// When ESCAPE key is hit close the header search section
-function eventHeaderSearch(event) {
-  if (event.which === 27) {
-    event.preventDefault();
-    store.headerSearch({ mode: "off" });
-  }
-}
-
-// Attach ESCAPE key event listener
-onMounted(() => {
-  document.addEventListener("keydown", eventHeaderSearch);
-});
-
-// Remove keydown event listener
-onUnmounted(() => {
-  document.removeEventListener("keydown", eventHeaderSearch);
-});
+ 
+ 
 </script>
 
 <template>
@@ -50,7 +24,8 @@ onUnmounted(() => {
               <!-- Toggle Sidebar -->
               <button
                 type="button"
-                class="btn btn-sm btn-alt-secondary me-2 d-lg-none"
+                class="btn btn-sm btn-alt-secondary me-2 d-lg-none smini-hide fs-5 tracking-wider text-center"
+       
                 @click="store.sidebar({ mode: 'toggle' })"
               >
                 <i class="fa fa-fw fa-bars"></i>
@@ -60,12 +35,18 @@ onUnmounted(() => {
               <!-- Toggle Mini Sidebar -->
               <button
                 type="button"
-                class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block"
+                style="margin-left: -60px;"
+                class="btn btn-sm btn-primary me-2 d-none d-lg-inline-block"
                 @click="store.sidebarMini({ mode: 'toggle' })"
               >
-                <i class="fa fa-fw fa-ellipsis-v"></i>
+               <i class="fa-solid fa-xmark"></i>
               </button>
+               
               <!-- END Toggle Mini Sidebar -->
+
+            
+             
+              <!-- END Search Form -->
             </slot>
           </div>
           <!-- END Left Section -->
@@ -73,15 +54,116 @@ onUnmounted(() => {
           <!-- Right Section -->
           <div class="d-flex align-items-center">
             <slot name="content-right">
-              <!-- Toggle Side Overlay -->
-              <button
-                type="button"
-                class="btn btn-sm btn-alt-secondary ms-2"
-                @click="store.sideOverlay({ mode: 'toggle' })"
-              >
-                <i class="fa fa-fw fa-list-ul fa-flip-horizontal"></i>
-              </button>
-              <!-- END Toggle Side Overlay -->
+              <!-- User Dropdown -->
+              <div  style="color: red; font-size: 16px; font-weight: 800;" >ADMIN</div>
+               <div class="dropdown d-inline-block ms-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-alt-secondary d-flex align-items-center"
+                  id="page-header-user-dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <img
+                    class="rounded-circle"
+                    src="/assets/media/avatars/avatar10.jpg"
+                    alt="Header Avatar"
+                    style="width: 21px"
+                  />
+                  <span class="d-none d-sm-inline-block ms-2">ADMIN</span>
+                  <i
+                    class="fa fa-fw fa-angle-down d-none d-sm-inline-block opacity-50 ms-1 mt-1"
+                  ></i>
+                </button>
+                <div
+                  class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0 border-0"
+                  aria-labelledby="page-header-user-dropdown"
+                >
+                  <div
+                    class="p-3 text-center bg-body-light border-bottom rounded-top"
+                  >
+                    <img
+                      class="img-avatar img-avatar48 img-avatar-thumb"
+                      src="/assets/media/avatars/avatar10.jpg"
+                      alt="Header Avatar"
+                    />
+                    <p class="mt-2 mb-0 fw-medium">ADMIN ADMIN</p>
+     
+                  </div>
+                  <div role="separator" class="dropdown-divider m-0"></div>
+                  <div class="p-2">
+                   
+              
+                 
+                  </div>
+                </div>
+              </div>
+              <!-- END User Dropdown -->
+
+              <!-- Notifications Dropdown -->
+              <div class="dropdown d-inline-block ms-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-alt-secondary space-x-1"
+                  id="page-header-notifications-dropdown"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <i class="fa fa-fw fa-bell"></i>
+                  <span v-if="notifications.length > 0" class="text-primary"
+                    >•</span
+                  >
+                </button>
+                <div
+                  class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 border-0 fs-sm"
+                  aria-labelledby="page-header-notifications-dropdown"
+                >
+                  <div
+                    class="p-2 bg-body-light border-bottom text-center rounded-top"
+                  >
+                    <h5 class="dropdown-header text-uppercase">
+                      Notifications
+                    </h5>
+                  </div>
+                  <ul class="nav-items mb-0">
+                    <li
+                      v-for="(notification, index) in notifications"
+                      :key="`notification-${index}`"
+                    >
+                      <a
+                        class="text-dark d-flex py-2"
+                        :href="`${notification.href}`"
+                      >
+                        <div class="flex-shrink-0 me-2 ms-3">
+                          <i :class="`${notification.icon}`"></i>
+                        </div>
+                        <div class="flex-grow-1 pe-2">
+                          <div class="fw-semibold">
+                            {{ notification.title }}
+                          </div>
+                          <span class="fw-medium text-muted">
+                            {{ notification.time }}
+                          </span>
+                        </div>
+                      </a>
+                    </li>
+                    <li v-if="!notifications.length" class="p-2">
+                      <div
+                        class="alert alert-light d-flex align-items-center space-x-2 mb-0"
+                        role="alert"
+                      >
+                        <i class="fa fa-exclamation-triangle opacity-50"></i>
+                        <p class="mb-0">No new ones!</p>
+                      </div>
+                    </li>
+                  </ul>
+                 
+                </div>
+              </div>
+              <!-- END Notifications Dropdown -->
+ 
             </slot>
           </div>
           <!-- END Right Section -->
@@ -95,27 +177,7 @@ onUnmounted(() => {
         class="overlay-header bg-body-extra-light"
         :class="{ show: store.settings.headerSearch }"
       >
-        <div class="content-header">
-          <form class="w-100" @submit.prevent="onSubmitSearch">
-            <div class="input-group">
-              <button
-                type="button"
-                class="btn btn-alt-danger"
-                @click="store.headerSearch({ mode: 'off' })"
-              >
-                <i class="fa fa-fw fa-times-circle"></i>
-              </button>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search or hit ESC.."
-                id="page-header-search-input"
-                name="page-header-search-input"
-                v-model="baseSearchTerm"
-              />
-            </div>
-          </form>
-        </div>
+         
       </div>
       <!-- END Header Search -->
 
@@ -127,7 +189,8 @@ onUnmounted(() => {
       >
         <div class="content-header">
           <div class="w-100 text-center">
-            <i class="fa fa-fw fa-circle-notch fa-spin"></i>
+            <!-- <img style="width: 10px;" src="/assets/media/photos/toothless.png" alt="Logo">            -->
+
           </div>
         </div>
       </div>

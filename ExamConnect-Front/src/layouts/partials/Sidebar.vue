@@ -103,7 +103,7 @@ onMounted(() => {
             <span class="smini-visible">
               <i class="fa fa-circle-notch text-primary"></i>
             </span>
-            <span class="smini-hide fs-5 tracking-wider"> TEST App </span>
+            <span class="smini-hide fs-6 tracking-wider"> Exam-Connect </span>
           </RouterLink>
           <!-- END Logo -->
         </slot>

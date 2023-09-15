@@ -42,7 +42,7 @@ connection.connect(function (err) {
 app.use('/public', express.static('public'));
 
 
-app.use("/api/questions", require("./routers/Questions.router"));
+app.use("/api/questions", require("./routers/questions.router"));
 app.use("/api/users", require("./routers/users.router"));
 app.use("/api/exams", require("./routers/exams.router"));
 

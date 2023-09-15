@@ -258,12 +258,13 @@ const Error503 = () => import("@/views/errors/503View.vue");
 const ExamConnectDashboard = () => import("@/views/examconnect/DashboardView.vue");
 const CreateExam = () => import("@/views/examconnect/Exams/CreateExam.vue");
 const ExamsList = () => import("@/views/examconnect/Exams/ExamsList.vue");
-const OneExamPage = () => import("@/views/examconnect/Exams/OneExamPage.vue");
+const OneExamPageAdmin = () => import("@/views/examconnect/Exams/OneExamPageAdmin.vue");
 const Authentication = () => import("@/views/examconnect/Auth/AuthenticationPage.vue");
 const CreateQuestion= () => import("@/views/examconnect/Questions/CreateQuestion.vue");
 const QuestionsList = () => import("@/views/examconnect/Questions/QuestionsList.vue");
 const CreateUser= () => import("@/views/examconnect/Users/CreateUser.vue");
 const Userslist = () => import("@/views/examconnect/Users/Userslist.vue");
+const OneExamPageUser = () => import("@/views/examconnect/Exams/OneExamPageUser.vue");
 
 
 
@@ -311,7 +312,7 @@ const routes = [
       },{
         path: "exams/examconnect-exams-exam",
         name: "examconnect-exams-exam",
-        component: OneExamPage,
+        component: OneExamPageAdmin,
       },{
         path: "questions/examconnect-questions-list",
         name: "examconnect-questions-list",
@@ -341,13 +342,13 @@ const routes = [
   |
   */
   {
-    path: "/backend-boxed",
+    path: "/examconnect-user",
     component: LayoutBackendBoxed,
     children: [
       {
-        path: "",
-        name: "backend-boxed-dashboard",
-        component: BackendBoxedDashboard,
+        path: "examconnect-user-exam",
+        name: "examconnect-user-exam",
+        component: OneExamPageUser,
       },
       {
         path: "simple1",

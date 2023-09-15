@@ -1,7 +1,7 @@
 <script>
 import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
+import QuestionsService from "../../../services/questions.service";
 export default {
   data() {
     return {
@@ -49,6 +49,15 @@ export default {
     },
     saveQst() {
       console.log(this.question);
+      QuestionsService.createQuestion(this.question)
+        .then((response) => {
+          console.log(response.data);
+          console.log("Question created successfully");
+          return
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     previewImage(event, index) {
       var input = event.target;
@@ -242,6 +251,7 @@ export default {
                             type="file"
                             id="my-file"
                             accept="image/*"
+                            name="qstImages"
                             @change="previewImage($event, index)"
                           />
                         </div>
