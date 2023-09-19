@@ -6,10 +6,12 @@ export default {
       bgClass: ["bg-city","bg-flat","bg-amethyst","bg-smooth","bg-default","bg-modern","bg-warning","bg-success","bg-info","bg-danger","bg-gray-dark","bg-primary",],
       exams: [],
     };
-  },
-  mounted() {
-    ExamsService.getAllExams().then((response) => {
-      const examsCustom = response.data.map((exam) => {
+  },methods: {
+    async fetchExams() {
+
+      await ExamsService.getAllExams().then((response) => 
+      {
+        const examsCustom = response.data.map((exam) => {
         const startTime = new Date(exam.startTime);
         const endTime = new Date(exam.endTime);
 
@@ -31,9 +33,12 @@ export default {
           examDuration: examDuration,
         };
       });
-      console.log(examsCustom);
-      this.exams = examsCustom;
+       this.exams = examsCustom;
     });
+    },
+  },
+  mounted() {
+    this.fetchExams()
   },
 };
 </script>

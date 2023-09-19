@@ -41,13 +41,12 @@ store.mainContent({ mode: "boxed" });
       <!-- Left Section -->
       <div class="d-flex align-items-center">
         <!-- Logo -->
-        <RouterLink
-          :to="{ name: 'landing' }"
-          class="fw-semibold fs-5 tracking-wider text-dual me-3"
-        >
-          OneUI
-          <span class="fw-normal">Vue</span>
-        </RouterLink>
+        
+      <div  class="fw-semibold fs-5 tracking-wider text-dual me-3">
+
+        Exam
+        <span class="fw-normal">Connect</span>
+      </div>
         <!-- END Logo -->
 
         
@@ -78,7 +77,7 @@ store.mainContent({ mode: "boxed" });
               alt="Header Avatar"
               style="width: 21px"
             />
-            <span class="d-none d-sm-inline-block ms-2">John</span>
+            <span class="d-none d-sm-inline-block ms-2">User</span>
             <i
               class="fa fa-fw fa-angle-down d-none d-sm-inline-block opacity-50 ms-1"
             ></i>
@@ -95,39 +94,12 @@ store.mainContent({ mode: "boxed" });
                 src="/assets/media/avatars/avatar10.jpg"
                 alt="Header Avatar"
               />
-              <p class="mt-2 mb-0 fw-medium">John Smith</p>
-              <p class="mb-0 text-muted fs-sm fw-medium">Web Developer</p>
-            </div>
-            <div class="p-2">
-              <a
-                class="dropdown-item d-flex align-items-center justify-content-between"
-                href="javascript:void(0)"
-              >
-                <span class="fs-sm fw-medium">Inbox</span>
-                <span class="badge rounded-pill bg-primary ms-2">3</span>
-              </a>
-              <RouterLink
-                :to="{ name: 'backend-pages-generic-profile' }"
-                class="dropdown-item d-flex align-items-center justify-content-between"
-              >
-                <span class="fs-sm fw-medium">Profile</span>
-                <span class="badge rounded-pill bg-primary ms-2">1</span>
-              </RouterLink>
-              <a
-                class="dropdown-item d-flex align-items-center justify-content-between"
-                href="javascript:void(0)"
-              >
-                <span class="fs-sm fw-medium">Settings</span>
-              </a>
-            </div>
+              <p class="mt-2 mb-0 fw-medium">Full Name</p>
+             </div>
+              
             <div role="separator" class="dropdown-divider m-0"></div>
             <div class="p-2">
-              <RouterLink
-                :to="{ name: 'auth-lock' }"
-                class="dropdown-item d-flex align-items-center justify-content-between"
-              >
-                <span class="fs-sm fw-medium">Lock Account</span>
-              </RouterLink>
+               
               <RouterLink
                 :to="{ name: 'auth-signin' }"
                 class="dropdown-item d-flex align-items-center justify-content-between"

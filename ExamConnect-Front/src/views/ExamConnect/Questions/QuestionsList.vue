@@ -1,74 +1,40 @@
 <script>
+import QuestionsService from "../../../services/questions.service";
+import qstVue from "../components/questions/qst.vue";
 export default {
   data() {
     return {
-      os: [
-        {
-          id: 1,
-          isQcm: 1,
-        },
-        {
-          id: 2,
-          isQcm: 0,
-        },
-        {
-          id: 3,
-          isQcm: 2,
-        },
-        {
-          id: 4,
-          isQcm: 0,
-        },
-        {
-          id: 5,
-          isQcm: 1,
-        },
-        {
-          id: 6,
-          isQcm: 0,
-        },
-        {
-          id: 7,
-          isQcm: 2,
-        },
-        {
-          id: 8,
-          isQcm: 0,
-        },
-        {
-          id: 9,
-          isQcm: 1,
-        },
-        {
-          id: 10,
-          isQcm: 0,
-        },
-      ],
-      ns: [
-        {
-          id: 1,
-          isTrue: 1,
-        },
-        {
-          id: 2,
-          isTrue: 0,
-        },
-        {
-          id: 3,
-          isTrue: 0,
-        },
-        {
-          id: 4,
-          isTrue: 0,
-        },
-        
-      ],
+      questions: [],
+      questionsFiltred: [],
       orderSearch: false,
+      filterTearm: this.$route.query.filterTearm,
+      IMAGES_PATH: "http://localhost:3000/public/images/",
+      spiner: true,
     };
   },
+  components: {
+    qstVue,
+  },
+  methods: {
+    fetchQuestions() {
+      QuestionsService.getAllQuestions().then((response) => {
+        this.questions = response.data;
+        if(this.filterTearm) this.filterByType(this.filterTearm);
+        else this.questionsFiltred = response.data;
+      });
+    },
+    filterByType(type) {
+      this.questionsFiltred = this.questions;
+      if (type == "all") return;
+      this.questionsFiltred = this.questionsFiltred.filter((question) => {
+        return question.isQcm == type;
+      });
+    },
+  },
   mounted() {
-    setInterval(() => {
-      this.currentTime = new Date().toLocaleTimeString();
+    this.fetchQuestions();
+    setTimeout(() => {
+      this.spiner = false;
     }, 1000);
   },
 };
@@ -83,7 +49,6 @@ export default {
       <div class="py-3 text-center">
         <h1 class="fw-bold mb-2">All Questions</h1>
       </div>
-      
     </div>
   </div>
   <!-- END Hero -->
@@ -127,7 +92,7 @@ export default {
               aria-labelledby="dropdown-recent-orders-filters"
             >
               <a
-                @click="filters.name.value = 'USER'"
+                @click="filterByType(0)"
                 class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
                 href="javascript:void(0)"
               >
@@ -135,7 +100,7 @@ export default {
                 <span class="badge bg-primary rounded-pill">110</span>
               </a>
               <a
-                @click="filters.name.value = 'RESPONSIBLE'"
+                @click="filterByType(1)"
                 class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
                 href="javascript:void(0)"
               >
@@ -143,7 +108,7 @@ export default {
                 <span class="badge bg-primary rounded-pill">115</span>
               </a>
               <a
-                @click="filters.name.value = ''"
+                @click="filterByType(2)"
                 class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
                 href="javascript:void(0)"
               >
@@ -151,7 +116,7 @@ export default {
                 <span class="badge bg-primary rounded-pill">115</span>
               </a>
               <a
-                @click="filters.name.value = ''"
+                @click="filterByType('all')"
                 class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
                 href="javascript:void(0)"
               >
@@ -164,102 +129,44 @@ export default {
       </template>
 
       <template #content>
-        <div
-          v-if="orderSearch"
-          id="one-dashboard-search-orders"
-          class="block-content border-bottom"
-        >
-          <!-- Search Form -->
-          <form @submit.prevent>
-            <div class="push">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control form-control-alt"
-                  id="one-ecom-orders-search"
-                  name="one-ecom-orders-search"
-                  placeholder="Search all orders.."
-                />
-                <span class="input-group-text bg-body border-0">
-                  <i class="fa fa-search"></i>
-                </span>
-              </div>
-            </div>
-          </form>
-          <!-- END Search Form -->
+        <div v-if="spiner" style="height: 300px; display:grid; place-items: center;">
+          <div class="col-6 col-md-3">
+            <i class="fa fa-4x fa-cog fa-spin"></i>
+          </div>
         </div>
-        <div class="table-responsive">
+        <div v-else>
+          <div
+            v-if="orderSearch"
+            id="one-dashboard-search-orders"
+            class="block-content border-bottom"
+          >
+            <!-- Search Form -->
+            <form @submit.prevent>
+              <div class="push">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control form-control-alt"
+                    id="one-ecom-orders-search"
+                    name="one-ecom-orders-search"
+                    placeholder="Search all orders.."
+                  />
+                  <span class="input-group-text bg-body border-0">
+                    <i class="fa fa-search"></i>
+                  </span>
+                </div>
+              </div>
+            </form>
+            <!-- END Search Form -->
+          </div>
           <div class="content">
-            <!-- Dummy content -->
-
-            <div v-for="o in os" class="col-12">
-              <BaseBlock v-if="o.isQcm">
-                <div v-if="o.isQcm == 1">
-                  <h2 class="content-heading">Question 1</h2>
-                  <!-- creating the Question body -->
-                  <h4>1 -what the true Sentence int this three Sentences</h4>
-                  <div class="m-5">
-                    <div class="m-3">
-                      <input
-                        type="checkbox"
-                        class="form-check-input is-valid"
-                        checked
-                        disabled
-                      />
-                      <label class="qst"> a- the first Sentence is true</label>
-                    </div>
-                    <div class="m-3">
-                      <input
-                        type="checkbox"
-                        class="form-check-input is-invalid"
-                        disabled
-                      />
-                      <label class="qst">b- the seconde Sentence is true</label>
-                    </div>
-                    <div class="m-3">
-                      <input
-                        type="checkbox"
-                        class="form-check-input is-invalid"
-                        disabled
-                      />
-                      <label class="qst">c- the third Sentence is true</label>
-                    </div>
-                  </div>
-                </div>
-                <div v-else>
-                  <h2 class="content-heading">Question 1</h2>
-                  <!-- creating the Question body -->
-                  <h4>1 - Choose the Logic image</h4>
-                  <div class="d-flex flex-wrap justify-content-center">
-                    <div v-for="(n, index) in ns" class="m-5" :key="index">
-                      <div style="width: 200px">
-                        <img
-                          style="width: 100%"
-                          src="/assets/media/photos/photo1@2x.jpg"
-                          alt="jashdjk"
-                        />
-                      </div>
-                      <div class="text-center">
-                        <input
-                          type="checkbox"
-                          class="form-check-input "
-                          :class="n.isTrue ? 'is-valid' : 'is-invalid'"
-                          :checked="n.isTrue"
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </BaseBlock>
-
-              <BaseBlock v-else>
-                <h2 class="content-heading">Question 8</h2>
-                <!-- creating the Question body -->
-                <h4>1 -Answer this question by writing a the Answear ?</h4>
-              </BaseBlock>
+            <div v-for="(question, index) in questionsFiltred" class="col-12">
+              <qstVue
+                :question="question"
+                :isAdmin="true"
+                :index="index"
+              ></qstVue>
             </div>
-            <!-- END Dummy content -->
           </div>
         </div>
       </template>

@@ -48,16 +48,63 @@ export default {
       });
     },
     saveQst() {
-      console.log(this.question);
-      QuestionsService.createQuestion(this.question)
-        .then((response) => {
-          console.log(response.data);
-          console.log("Question created successfully");
-          return
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      if (this.question.isQcm == 2) {
+        if (this.question.qstImages.length < 2) {
+          this.globalService.toasterShowWarning("Please add at least 2 images");
+        } else {
+          // check if there is a null image and if  all the images are false using foreach
+          var isNull = false;
+          var isAllFalse = true;
+          this.question.qstImages.forEach((element) => {
+            if (element.image == null) {
+              isNull = true;
+              return;
+            }
+            if (element.isTrue == true) {
+              isAllFalse = false;
+            }
+          });
+
+          if (isNull) {
+            this.globalService.toasterShowWarning(
+              "Please select an image for each option"
+            );
+            return;
+          }
+          if (isAllFalse) {
+            this.globalService.toasterShowWarning(
+              "Please select at least one true image"
+            );
+            return;
+          }
+        }
+
+      }else  if (this.question.isQcm == 1) {
+        if (this.question.qstOptions.length < 2) {
+          this.globalService.toasterShowWarning("Please add at least 2 images");
+        } else {
+          // check if there is a null image and if  all the images are false using foreach
+           var isAllFalse = true;
+          this.question.qstOptions.forEach((element) => {
+            if (element.isTrue == true) {
+              isAllFalse = false;
+              return
+            }
+          });
+          if (isAllFalse) {
+            this.globalService.toasterShowWarning(
+              "Please select at least one true option"
+            );
+            return;
+          }
+        }
+        //This is test for Push with query params ?
+      }
+      QuestionsService.createQuestion(this.question);
+      this.$router.push({
+        name: "examconnect-questions-list",
+        query: { filterTearm: this.question.isQcm },
+      });
     },
     previewImage(event, index) {
       var input = event.target;
@@ -70,20 +117,19 @@ export default {
         reader.readAsDataURL(input.files[0]);
       }
     },
-    reset(index=null) {
-        if(index != null){
-            this.question.qstImages[index].preview = null;
-            this.question.qstImages[index].image = null;
-            this.question.qstImages[index].preview_list = [];
-            this.question.qstImages[index].image_list = [];
-          }
-      else {
-            for (let i = 0; i < this.question.qstImages.length; i++) {
-            this.question.qstImages[i].preview = null;
-            this.question.qstImages[i].image = null;
-            this.question.qstImages[i].preview_list = [];
-            this.question.qstImages[i].image_list = [];
-         }
+    reset(index = null) {
+      if (index != null) {
+        this.question.qstImages[index].preview = null;
+        this.question.qstImages[index].image = null;
+        this.question.qstImages[index].preview_list = [];
+        this.question.qstImages[index].image_list = [];
+      } else {
+        for (let i = 0; i < this.question.qstImages.length; i++) {
+          this.question.qstImages[i].preview = null;
+          this.question.qstImages[i].image = null;
+          this.question.qstImages[i].preview_list = [];
+          this.question.qstImages[i].image_list = [];
+        }
       }
     },
   },
@@ -128,7 +174,7 @@ export default {
               <strong>Text Question</strong>
             </div>
             <input
-              @click="question.isQcm = question.isQcm==1?0:1"
+              @click="question.isQcm = question.isQcm == 1 ? 0 : 1"
               class="form-check-input"
               type="checkbox"
               value=""
@@ -162,7 +208,7 @@ export default {
                   <strong>Image Options</strong>
                 </div>
                 <input
-                  @click="question.isQcm = question.isQcm==1?2:1"
+                  @click="question.isQcm = question.isQcm == 1 ? 2 : 1"
                   class="form-check-input"
                   type="checkbox"
                   value=""
@@ -183,79 +229,80 @@ export default {
               <div class="row">
                 <div class="col-md-5 offset-md-1">
                   <form>
-                    <div class="form-group  ">
-            
-                        <div v-for="(n, index) in question.qstImages">
-                        <div class="d-flex justify-content-between" style="margin-left: 50px;">
+                    <div class="form-group">
+                      <div v-for="(n, index) in question.qstImages">
+                        <div
+                          class="d-flex justify-content-between"
+                          style="margin-left: 50px"
+                        >
+                          <div
+                            class="card"
+                            style="width: 18rem"
+                            v-if="question.qstImages[index].preview"
+                          >
+                            <img
+                              :src="question.qstImages[index].preview"
+                              class="img-fluid card-img-top"
+                            />
+                            <div class="card-body">
+                              <p class="mb-0 card-text">
+                                file name:
+                                {{ question.qstImages[index].image.name }}
+                              </p>
+                              <p class="mb-0 card-text">
+                                size:
+                                {{
+                                  question.qstImages[index].image.size / 1024
+                                }}KB
+                              </p>
+                            </div>
+                          </div>
 
-                                <div
-                                class="card"
-                                style="width: 18rem"
-                                v-if="question.qstImages[index].preview"
-                                >
-                                <img
-                                    :src="question.qstImages[index].preview"
-                                    class="img-fluid card-img-top"
-                                />
-                                <div class="card-body">
-                                    <p class="mb-0 card-text">
-                                    file name:
-                                    {{ question.qstImages[index].image.name }}
-                                    </p>
-                                    <p class="mb-0 card-text">
-                                    size:
-                                    {{
-                                        question.qstImages[index].image.size / 1024
-                                    }}KB
-                                    </p>
-                                </div>
-                                </div>
+                          <div
+                            style="width: 50px; height: 50px; margin-top: 10px"
+                            v-if="question.qstImages[index].preview"
+                          >
+                            <input
+                              type="radio"
+                              class="btn-check"
+                              :name="'options-outlined-' + index"
+                              :id="'true-outlined-' + index"
+                              v-model="question.qstImages[index].isTrue"
+                              :value="true"
+                            />
+                            <label
+                              class="btn btn-outline-success"
+                              :for="'true-outlined-' + index"
+                              >&nbsp;True</label
+                            >
 
-                                <div
-                                    style="width: 50px; height: 50px; margin-top: 10px"
-                                    v-if="question.qstImages[index].preview"
-                                >
-                                    <input
-                                    type="radio"
-                                    class="btn-check"
-                                    :name="'options-outlined-' + index"
-                                    :id="'true-outlined-' + index"
-                                    v-model="question.qstImages[index].isTrue"
-                                    :value="true"
-                                    />
-                                    <label
-                                    class="btn btn-outline-success"
-                                    :for="'true-outlined-' + index"
-                                    >&nbsp;True</label
-                                    >
-
-                                    <input
-                                    type="radio"
-                                    class="btn-check"
-                                    :name="'options-outlined-' + index"
-                                    :id="'false-outlined-' + index"
-                                    v-model="question.qstImages[index].isTrue"
-                                    :value="false"
-                                    />
-                                    <label
-                                    class="btn btn-outline-danger"
-                                    :for="'false-outlined-' + index"
-                                    >False</label
-                                    >
-                                </div>
+                            <input
+                              type="radio"
+                              class="btn-check"
+                              :name="'options-outlined-' + index"
+                              :id="'false-outlined-' + index"
+                              v-model="question.qstImages[index].isTrue"
+                              :value="false"
+                            />
+                            <label
+                              class="btn btn-outline-danger"
+                              :for="'false-outlined-' + index"
+                              >False</label
+                            >
+                          </div>
                         </div>
-                       
+
                         <div class="d-flex justify-content-center">
                           <input
                             class="form-control form-control-file m-3"
                             type="file"
-                            id="my-file"
+                            :id="'image-' + index"
                             accept="image/*"
-                            name="qstImages"
+                            name="image"
                             @change="previewImage($event, index)"
                           />
                         </div>
-                            
+
                         <div
                           class="btn btn-secondary text-center rounded rounded-circle m-3"
                           style="width: 50px; height: 50px"
@@ -272,13 +319,12 @@ export default {
                           ></i>
                         </div>
                         <button
-                              class="btn btn-secondary rounded rounded-pill"
-                              @click="reset(index)"
-                            >
-                              Clear  
-                            </button>
+                          class="btn btn-secondary rounded rounded-pill"
+                          @click="reset(index)"
+                        >
+                          Clear
+                        </button>
                       </div>
-
 
                       <div>
                         <div>

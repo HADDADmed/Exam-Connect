@@ -1,5 +1,37 @@
-<script setup>
+<script >
+import UsersService from '../../../services/users.service';
+     export default {
+          data(){
+               return{
+                    newUser:{
+                         fullName:'',
+                         email:'',
+                         password:'',
+                         password_confirmation:''
+                    }
+               }
+          },methods:{
+               createUser(){
+                if(!(this.globalService.passwordValidation(this.newUser.password,this.newUser.password_confirmation))){
+                    return
+                }else
+                {
+                     this.globalService.showConfirmMessage('you want to confirm creating this User ?').then(res=>{
+                          if(res.value){
+                               UsersService.createUser(this.newUser).then(res=>{
+                                    this.globalService.toasterShowSuccess('User Created Successfully')
+                                    this.$router.push({name:'examconnect-users-list'})
+                               }).catch(err=>{
+                                    this.globalService.errorMessage('Error Creating User')
+                               })
+                          }
+                     })
+                }
 
+               
+          }
+     }
+}
  
 </script>
 
@@ -14,11 +46,11 @@
                     <ol class="breadcrumb breadcrumb-alt">
                          <li class="breadcrumb-item">
                               <a class="link-fx" href="javascript:void(0)"
-                                   >Create New</a
+                                   >Users</a
                               >
                          </li>
                          <li class="breadcrumb-item" aria-current="page">
-                              User
+                              new-User
                          </li>
                     </ol>
                </nav>
@@ -36,7 +68,7 @@
                               <div class="card-body">
                                    <div class="container">
                                         <form
-                                             @submit.prevent="(e) => {console.log('user Created')}"
+                                             @submit.prevent="createUser()"
                                              id="contact-form"
                                              role="form"
                                         >
@@ -59,33 +91,10 @@
                                                                       placeholder="enter the User full Name *"
                                                                       required="required"
                                                                       data-error="Firstname is required."
+                                                                      v-model="newUser.fullName"
                                                                  />
                                                             </div>
                                                        </div>
-                                                       <div class="col-md-6">
-                                                            <div
-                                                                 class="form-group animated bounceInLeft"
-                                                            >
-                                                                 <label
-                                                                      for="form_phoneNumber"
-                                                                      >Phone
-                                                                      number
-                                                                      *</label
-                                                                 >
-                                                                 <input
-                                                                      id="form_phoneNumber"
-                                                                      type="text"
-                                                                      
-                                                                      name="surname"
-                                                                      class="form-control form-control-alt"
-                                                                      placeholder="enter the User phone number *"
-                                                                      required="required"
-                                                                      data-error="Lastname is required."
-                                                                 />
-                                                            </div>
-                                                       </div>
-                                                  </div>
-                                                  <div class="row">
                                                        <div class="col-md-6">
                                                             <div
                                                                  class="form-group animated bounceInLeft"
@@ -104,48 +113,12 @@
                                                                       placeholder="Please enter your email *"
                                                                       required="required"
                                                                       data-error="Valid email is required."
+                                                                      v-model="newUser.email"
                                                                  />
                                                             </div>
                                                        </div>
-                                                       <div class="col-md-6">
-                                                            <div
-                                                                 class="form-group animated bounceInRight"
-                                                            >
-                                                                 <label
-                                                                      style="
-                                                                           color: red;
-                                                                      "
-                                                                      for="form_role"
-                                                                      >Select
-                                                                      the user
-                                                                      Role
-                                                                      *</label
-                                                                 >
-                                                                 <select
-                                                                       
-                                                                      id="form_role"
-                                                                      name="role"
-                                                                      class="form-control form-control-alt"
-                                                                      required="required"
-                                                                      data-error="Please specify the role."
-                                                                 >
-                                                                      <option
-                                                                           value=""
-                                                                           selected
-                                                                           disabled
-                                                                      >
-                                                                           --Select
-                                                                           Role--
-                                                                      </option>
-                                                                      <option
-                                               
-                                                                      >
-                                                                          1
-                                                                      </option>
-                                                                 </select>
-                                                            </div>
-                                                       </div>
                                                   </div>
+                                                   
                                                   <div
                                                        class="row"
                                                        style="margin-top: 30px"
@@ -169,6 +142,7 @@
                                                                       placeholder="enter the User Access Pasword *"
                                                                       required="required"
                                                                       data-error="Pleas enter the Pasword."
+                                                                      v-model="newUser.password"
                                                                  />
                                                             </div>
                                                        </div>
@@ -191,6 +165,7 @@
                                                                       placeholder="comfirm the Access Pasword *"
                                                                       required="required"
                                                                       data-error="Pleas enter the Pasword comfirmation."
+                                                                      v-model="newUser.password_confirmation"
                                                                  />
                                                             </div>
                                                        </div>

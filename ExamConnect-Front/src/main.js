@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import Toaster from '@meforma/vue-toaster';
 
 // You can use the following starter router instead of the default one as a clean starting point
 // import router from "./router/starter";
@@ -34,7 +35,7 @@ app.directive("click-ripple", clickRipple);
 // Use Pinia and Vue Router
 app.use(createPinia());
 app.use(router);
-
+app.use(Toaster);
 
 app.config.globalProperties.globalService = GlobalService
 

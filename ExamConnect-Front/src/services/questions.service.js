@@ -1,94 +1,86 @@
+import axios from "axios";
+import GlobalService from "./global.service";
 
-
-import axios from 'axios';
-
-const API_URL = 'http://localhost:3000/api/questions/';
+const API_URL = "http://localhost:3000/api/questions/";
 
 class QuestionsService {
-    
-        getAllQuestions() {
-            return axios.get(API_URL);
-        }
-        
-        getAllQuestionsIds() {
-            return axios.get(API_URL + 'ids');
-        }
-        
-        createQuestion(question) {
-            // Check if isQcm is 2
-            if (question.isQcm === 2) {
-                // Map qstOptions array to only include isTrue property
-                question.qstOptions = question.qstOptions.map((option) => {
-                    return {};
-                });
-        
-                const images = question.qstImages.map((imageObj) => {
-                    return imageObj.image;
-                });
+  getAllQuestions() {
+    return axios.get(API_URL);
+  }
 
-                const formatData2  = new FormData();
-                formatData2.append('qstImages', images );
+  getAllQuestionsIds() {
+    return axios.get(API_URL + "ids");
+  }
 
-                // Images_onUpload() {
-                //     const mypostparameters= new FormData()
-                //      mypostparameters.append('image', this.Images.selectedFile, this.Images.selectedFile.name);
-                //      mypostparameters.append('USERID', 21);
-                //      axios.post('/uploadmyfile', mypostparameters);
-                //     }
-
-
-                // // puhing the isTrue property to the image object in the qstImages array
-                // question.qstImages.forEach((imageObj, index) => {
-                //     // is true dose not exist in the imageobt.image and we need to add it
-                //     imageObj.image = { isTrue: imageObj.isTrue };
-                //     }
-                // );
-
-
-                console.log("question 1: ");
-                console.log(question);
-                // Create a new FormData object
-                const formData = new FormData();
-                
-
-
-
-                // Append the qstImages array as files to the FormData
-                question.qstImages.forEach((imageObj, index) => {
-                    formData.append(`qstImages[${index}].image`, imageObj.image);
-                    formData.append(`qstImages[${index}].isTrue`, imageObj.isTrue);
-                });
-        
-                // Append other properties of the question object to the FormData
-                Object.keys(question).forEach((key) => {
-                    if (key !== 'qstImages') {
-                        formData.append(key, question[key]);
-                    }
-                });
-        
-                console.log("question 1: ");
-                console.log(question);
-
-                console.log("formData: ");
-                console.log(formData);
-        
-                // Send the FormData to the backend with the appropriate endpoint
-                return axios.post(API_URL + 'imageQuestion', formatData2, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data', // Important to set the content type
-                    },
-                });
-            } else {
-                console.log("question 2: ");
-                console.log(question);
-        
-                // If isQcm is not 2, send the original question object to the default endpoint
-                return axios.post(API_URL, question);
-            }
-        }
-        
-    
+  createQuestion(question) {
+    var questionObj = {};
+    if (question.isQcm === 0 || question.isQcm === 2) {
+      questionObj = {
+        isQcm: question.isQcm,
+        qstText: question.qstText,
+        qstOptionCounter: question.qstOptionCounter,
+        examId: question.examId,
+      };
+    } else if (question.isQcm === 1) {
+      questionObj = {
+        isQcm: question.isQcm,
+        qstText: question.qstText,
+        qstOptionCounter: question.qstOptionCounter,
+        qstOptions: question.qstOptions,
+        examId: question.examId,
+      };
+    } else if(question.isQcm === 1) {
+      console.log("ERROR : isQcm is not 0 or 1 or 2");
     }
 
+    axios
+      .post(API_URL, questionObj)
+      .then((response) => {
+        const qstId = response.data.insertId;
+        // Check if isQcm is 2
+        if (question.isQcm === 2) {
+          question.qstOptions = question.qstOptions.map((option) => {
+            return {};
+          });
+          // Append the qstImages array as files to the FormData
+          let counter = 0;
+          question.qstImages.forEach((imageObj, index) => {
+            const formData = new FormData();
+            formData.append(`image`, imageObj.image);
+            formData.append(`isTrue`, imageObj.isTrue);
+            formData.append(`qstId`, qstId);
+
+            // Send the FormData to the backend with the appropriate endpoint
+            axios
+              .post(API_URL + "imageQuestion", formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data", // Important to set the content type
+                },
+              })
+              .then((response) => {
+                counter++;
+                console.log(response);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          });
+
+          GlobalService.toasterShowSuccess('Question with '+counter+' images created successfully !');
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+  }
+
+  getQuestionsCountsByType() {
+    return axios.get(API_URL + "counts");
+  }
+
+  
+}
 
 export default new QuestionsService();
