@@ -16,19 +16,16 @@ router.get("/", (req, res) => {
                 FROM Exam 
                 INNER JOIN exam_question ON Exam.id = exam_question.exam_id
                 INNER JOIN question ON exam_question.question_id = question.id
+                ORDER BY Exam.createdAt DESC;
       `;
   connection.query(query, (err, results) => {
     if (err) {
-       console.error("Error while fetching exams:", err);
-      res
-        .status(500)
-        .json({ message: "Error while fetching exams" });
+      console.error("Error while fetching exams:", err);
+      res.status(500).json({ message: "Error while fetching exams" });
     } else {
       const exams = [];
       results.forEach((row) => {
-        const existingExam = exams.find(
-          (exam) => exam.exam_id === row.exam_id
-        );
+        const existingExam = exams.find((exam) => exam.exam_id === row.exam_id);
         if (!existingExam) {
           exams.push({
             exam_id: row.exam_id,
@@ -39,8 +36,8 @@ router.get("/", (req, res) => {
             createdAt: row.createdAt,
             questions: [
               {
-                 id: row.question_id,
-                 isQcm: row.isQcm,
+                id: row.question_id,
+                isQcm: row.isQcm,
               },
             ],
           });
@@ -51,7 +48,7 @@ router.get("/", (req, res) => {
           });
         }
       });
-          res.status(200).json(exams);
+      res.status(200).json(exams);
     }
   });
 });
@@ -75,11 +72,9 @@ router.post("/", (req, res) => {
     query,
     [exam.examTitle, exam.questionsCount, exam.startTime, exam.endTime],
     (err, results) => {
-      if (err) { 
+      if (err) {
         console.error("Error while creating exam:", err);
-        res
-          .status(500)
-          .json({ message: "Error while creating exam" });
+        res.status(500).json({ message: "Error while creating exam" });
       } else {
         // insert questions
         const examId = results.insertId;
@@ -93,15 +88,11 @@ router.post("/", (req, res) => {
           connection.query(query, [examId, question.id], (err, results) => {
             if (err) {
               console.error("Error while creating exam:", err);
-              res
-                .status(500)
-                .json({ message: "Error while creating exam" });
+              res.status(500).json({ message: "Error while creating exam" });
             } else {
-                 console.log("question added to the Exam successfuly");
-                }
+              console.log("question added to the Exam successfuly");
+            }
           });
-
-
         });
         res.status(200).json({ message: "Exam created successfuly !" });
       }
@@ -114,92 +105,86 @@ router.post("/", (req, res) => {
 router.get("/exam/:id", (req, res) => {
   const examId = req.params.id;
   const query = `
-          SELECT 
-            Exam.id AS exam_id, 
-            Exam.ExamTitle, 
-            Exam.questionsCount, 
-            Exam.startTime,
-            Exam.endTime,
-            Exam.createdAt,
-            question.id AS question_id, 
-            question.question_text ,
-            question.isQcm,
-            qo.id AS option_id,
-            qo.question_text AS option_question_text,
-            qo.isTrue
-            
-            FROM Exam 
-            INNER JOIN exam_question ON Exam.id = exam_question.exam_id
-            INNER JOIN question ON exam_question.question_id = question.id
-            LEFT  JOIN questionoption AS qo ON question.id = qo.question_id
-            WHERE Exam.id = ?;
-    `;
-    
+    SELECT 
+        Exam.id AS exam_id, 
+        Exam.ExamTitle, 
+        Exam.questionsCount, 
+        Exam.startTime,
+        Exam.endTime,
+        Exam.createdAt,
+        question.id AS question_id, 
+        question.question_text,
+        question.isQcm,
+        qo.id AS option_id,
+        qo.question_text AS option_question_text,
+        qo.isTrue
+    FROM Exam 
+    INNER JOIN exam_question ON Exam.id = exam_question.exam_id
+    INNER JOIN question ON exam_question.question_id = question.id
+    LEFT JOIN questionoption AS qo ON question.id = qo.question_id
+    WHERE Exam.id = ?;
+`;
+
   connection.query(query, [examId], (err, results) => {
     if (err) {
       console.error("Error while fetching exam:", err);
-      res
-        .status(500)
-        .json({ message: "Error while fetching exam" });
+      res.status(500).json({ message: "Error while fetching exam" });
     } else {
-       if(results.length === 0) {
+      if (results.length === 0) {
         res.status(404).json({ message: "Exam not found" });
-
-          } else{
-
-            const exam = {
-              exam_id: results[0].exam_id,
-              ExamTitle: results[0].ExamTitle,
-              questionsCount: results[0].questionsCount,
-              startTime: results[0].startTime,
-              endTime: results[0].endTime,
-              createdAt: results[0].createdAt,
-              questions: [],
-            };
-            results.forEach((row) => {
-              const existingQuestion = exam.questions.find(
-                (question) => question.question_id === row.question_id
-              );
-              if (!existingQuestion) {
-                exam.questions.push({
-                  question_id: row.question_id,
-                  question_text: row.question_text,
-                  isQcm: row.isQcm,
-                  options: [
-                    {
-                      id: row.option_id,
-                      option_question_text: row.option_question_text,
-                      isTrue: row.isTrue,
-                    },
-                  ],
-                });
-              } else {
-                existingQuestion.options.push({
+      } else {
+        const exam = {
+          exam_id: results[0].exam_id,
+          ExamTitle: results[0].ExamTitle,
+          questionsCount: results[0].questionsCount,
+          startTime: results[0].startTime,
+          endTime: results[0].endTime,
+          createdAt: results[0].createdAt,
+          questions: [],
+        };
+        results.forEach((row) => {
+          const existingQuestion = exam.questions.find(
+            (question) => question.question_id === row.question_id
+          );
+          if (!existingQuestion) {
+            exam.questions.push({
+              question_id: row.question_id,
+              question_text: row.question_text,
+              isQcm: row.isQcm,
+              options: [
+                {
                   id: row.option_id,
-                  option_question_text: row.option_question_text,
+                  question_text: row.option_question_text,
                   isTrue: row.isTrue,
-                });
-              }
+                },
+              ],
             });
-
-            // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
-
-            const qcmQuestions = exam.questions.filter((question) => question.isQcm === 1);
-            const textQuestions = exam.questions.filter((question) => question.isQcm === 0);
-            const imageQuestions = exam.questions.filter((question) => question.isQcm === 2);
-            exam.questions = qcmQuestions.concat(textQuestions, imageQuestions);
-            
-            res.status(200).json(exam);
+          } else {
+            existingQuestion.options.push({
+              id: row.option_id,
+              question_text: row.option_question_text,
+              isTrue: row.isTrue,
+            });
           }
+        });
+
+        // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
+
+        const qcmQuestions = exam.questions.filter(
+          (question) => question.isQcm === 1
+        );
+        const textQuestions = exam.questions.filter(
+          (question) => question.isQcm === 0
+        );
+        const imageQuestions = exam.questions.filter(
+          (question) => question.isQcm === 2
+        );
+        exam.questions = qcmQuestions.concat(textQuestions, imageQuestions);
+
+        res.status(200).json(exam);
+      }
     }
-  }
-  );
-}
-);
-
-
-
-
-
+  });
+});
 
 module.exports = router;

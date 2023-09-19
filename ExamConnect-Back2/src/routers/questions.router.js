@@ -3,26 +3,39 @@ const router = express.Router();
 const connection = require("../DataBaseConf/MySqlConnection");
 const multer = require("multer");
 
+const path = require("path"); // Import the 'path' module
+function getfullDateTime(date1) {
+  const date = new Date(date1);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  return `${day}-${month}-${year}_${hours}-${minutes}-${seconds}`;
 
+  
+}
 
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Define the destination directory where uploaded images will be stored
-    cb(null, 'uploads/'); // You should create the 'uploads' directory
+    cb(null, "public/images/"); // Save to the 'public/images' directory
   },
   filename: (req, file, cb) => {
-    // Define how uploaded files should be named
     const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + ext);
+    var formatedDate = getfullDateTime(Date.now());
+
+    const uniqueSuffix =
+    "qst_option__"+formatedDate+
+    "__" +
+    Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + ext);
   },
 });
 
 // Create a Multer instance with the storage configuration
 const upload = multer({ storage });
-
-
 
 // Get All Questions from the database
 
@@ -98,29 +111,37 @@ router.get("/", (req, res) => {
           });
         }
       });
-      res.status(200).json(questions);
+      // sort the questions by isQcm  isQcm = 1 first then isQcm = 0 then isQcm = 2 ordred by createdAt
+      const qcmQsts = questions.filter((question) => question.isQcm === 1);
+      const textQsts = questions.filter((question) => question.isQcm === 0);
+      const imgQsts = questions.filter((question) => question.isQcm === 2);
+
+      // sort by createdAt the recent questions first
+      qcmQsts.sort((a, b) => b.createdAt - a.createdAt);
+      textQsts.sort((a, b) => b.createdAt - a.createdAt);
+      imgQsts.sort((a, b) => b.createdAt - a.createdAt);
+
+      const sortedQuestions = qcmQsts.concat(textQsts, imgQsts);
+      
+      res.status(200).json(sortedQuestions);
     }
   });
 });
 
-
 // Get all Questions id's and isQcm's from the database
 
 router.get("/ids", (req, res) => {
-    const query = "SELECT id, isQcm FROM question";
-    // english
-    connection.query(query, (err, results) => {
-        if (err) {
-            console.error("Error while fetching questions:", err);
-            res.status(500).json({ message: "Error while fetching questions" });
-        } else {
-
-            res.status(200).json(results);
-        }
-    });
+  const query = "SELECT id, isQcm FROM question";
+  // english
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error while fetching questions:", err);
+      res.status(500).json({ message: "Error while fetching questions" });
+    } else {
+      res.status(200).json(results);
+    }
+  });
 });
-
-
 
 // add new question to the database
 
@@ -128,108 +149,88 @@ router.post("/", (req, res) => {
   const question = req.body;
   const isQcm = question.isQcm;
   const options = question.qstOptions;
+  console.log(question);
 
   // inserting the wuestion first
   const query = "INSERT INTO question (question_text, isQcm) VALUES (?, ?)";
   connection.query(query, [question.qstText, question.isQcm], (err, result) => {
-    if (err || isQcm && isQcm === 2) {
+    if (err) {
       console.error("Erreur lors de l'insertion d'une question:", err);
       res
         .status(500)
         .json({ message: "Erreur lors de l'insertion d'une question" });
     } else {
+      const insertId = result.insertId;
       // inserting the question options
-      if(!isQcm){
-        res.status(200).json({ message: "Question added successfuly !" });
-      }else if (isQcm && isQcm === 1) {
+      if (!isQcm || (isQcm && isQcm === 2)) {
+        res.status(200).json(result);
+      } else if (isQcm && isQcm === 1) {
         const query =
           "INSERT INTO questionOption (question_id, question_text, isTrue) VALUES ?";
         const question_id = result.insertId;
+   
         const values = options.map((option) => [
           question_id,
           option.qstText,
           option.isTrue,
         ]);
+        
+
+        
         connection.query(query, [values], (err, result) => {
           if (err) {
             console.error(
               "Erreur lors de l'insertion des options d'une question:",
               err
             );
-            res
-              .status(500)
-              .json({
-                message:
-                  "Error while inserting question options",
-              });
+            res.status(500).json({
+              message: "Error while inserting question options",
+            });
           } else {
             res.status(200).json({ message: "Question added successfuly !" });
           }
         });
-      } 
+      }
     }
   });
 });
 
- 
+router.post(
+  "/imageQuestion",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "isTrue", maxCount: 1 },
+    { name: "qstId", maxCount: 1 },
+  ]),
+  (req, res) => {
+    // inserting the image question options
+    const question_id = req.body.qstId;
+    const isTrue = req.body.isTrue == "true" ? 1 : 0;
 
-// add new question with images 
+    const query =
+      "INSERT INTO questionOption (question_id, question_text, isTrue) VALUES (?, ?, ?)";
 
-// router.post("/imageQuestion", upload.single('image'), async (req, res) => {
-
-//   const question = req.body;
-//   const isQcm = question.isQcm;
-//   const options = question.qstOptions;
-//   const images =    // using multer to upload the image to the server and sharp to resize it
-
-
-// // add new question with images
-// router.post("/imageQuestion", upload.single("image"), async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       throw new Error("Please upload an image");
-//     }
-
-//     // Process the uploaded image using sharp
-//     const imagePath = path.join(__dirname, "../public/images/", req.file.filename);
-
-//     await sharp(req.file.path)
-//       .resize(300) // Set the desired image width (you can adjust as needed)
-//       .toFile(imagePath);
-
-//     // Now, imagePath contains the path to the processed image
-
-//     // You can save the imagePath to your database or use it as needed
-//     // For example, if you want to store the image path in a database:
-//     // const imagePathToSaveInDatabase = `/public/images/${req.file.filename}`;
-    
-//     // Respond with success
-//     res.status(201).send({ message: "Image uploaded and processed successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(400).send({ error: error.message });
-//   }
-// });
-
-// POST route for handling image uploads
-router.post('/imageQuestion', upload.array('qstImages'), (req, res) => {
-  // The 'qstImages' parameter in upload.array('qstImages', 5) should match the field name in your FormData on the frontend
-
-  // Here, req.files contains an array of uploaded files
-  // Each file will have properties like 'fieldname', 'originalname', 'filename', 'path', and 'size'
-  console.log("req.files :");
-  console.log(req.files);
-  console.log("req.body.qstImages :");
-  console.log(req.body.qstImages);
-  // Access other form fields in req.body
- 
-  // Perform any necessary processing with the uploaded files and form data
-
-  // Send a response to the client
-  res.json({ message: 'File(s) uploaded successfully' });
-});
-
-
+    connection.query(
+      query,
+      [question_id, req.files["image"][0].filename, isTrue],
+      (err, result) => {
+        if (err) {
+          console.error(
+            "Erreur lors de l'insertion des options d'une question:",
+            err
+          );
+          res.status(500).json({
+            message: "Error while inserting question options",
+          });
+        } else {
+          console.log("result :");
+          console.log(result);
+          res.status(200).json({ message: "Question added successfuly !" });
+        }
+      }
+    );
+  }
+);
 
 // update a question in the database
 
@@ -247,11 +248,9 @@ router.put("/:id", (req, res) => {
         "Erreur lors de la suppression des options d'une question:",
         err
       );
-      res
-        .status(500)
-        .json({
-          message: "Erreur lors de la suppression des options d'une question",
-        });
+      res.status(500).json({
+        message: "Erreur lors de la suppression des options d'une question",
+      });
     } else {
       // update the question
       const query = `
@@ -266,11 +265,9 @@ router.put("/:id", (req, res) => {
         (err, result) => {
           if (err) {
             console.error("Erreur lors de la mise à jour d'une question:", err);
-            res
-              .status(500)
-              .json({
-                message: "Erreur lors de la mise à jour d'une question",
-              });
+            res.status(500).json({
+              message: "Erreur lors de la mise à jour d'une question",
+            });
           } else {
             // inserting the question options
 
@@ -289,12 +286,10 @@ router.put("/:id", (req, res) => {
                     "Erreur lors de l'insertion des options d'une question:",
                     err
                   );
-                  res
-                    .status(500)
-                    .json({
-                      message:
-                        "Erreur lors de l'insertion des options d'une question",
-                    });
+                  res.status(500).json({
+                    message:
+                      "Erreur lors de l'insertion des options d'une question",
+                  });
                 } else {
                   res
                     .status(200)
@@ -314,30 +309,53 @@ router.put("/:id", (req, res) => {
 });
 
 
-
-
 /// delete a question from the database
 router.delete("/:id", (req, res) => {
-    const question_id = req.params.id;
-    const query = "DELETE FROM question WHERE id = ?";
-    const query2 = "DELETE FROM questionOption WHERE question_id = ?";
-    connection.query(query2, [question_id], (err, result) => {
-        if (err) {
-            console.error("Erreur lors de la suppression des options d'une question:", err);
-            res.status(500).json({ message: "Erreur lors de la suppression des options d'une question" });
-        } else {
-            connection.query(query, [question_id], (err, result) => {
-                if (err) {
-                    console.error("Erreur lors de la suppression d'une question:", err);
-                    res.status(500).json({ message: "Erreur lors de la suppression d'une question" });
-                } else {
-                    res.status(200).json({ message: "Question deleted successfuly !" });
-                }
-            });
-        }
-    });
-   
- });
+  const question_id = req.params.id;
+  const query = "DELETE FROM question WHERE id = ?";
+  const query2 = "DELETE FROM questionOption WHERE question_id = ?";
+  connection.query(query2, [question_id], (err, result) => {
+    if (err) {
+      console.error(
+        "Erreur lors de la suppression des options d'une question:",
+        err
+      );
+      res.status(500).json({
+        message: "Erreur lors de la suppression des options d'une question",
+      });
+    } else {
+      res.status(200).json({ message: "Question deleted successfuly !" });     
+    }
+  });
+});
+
+
+
+router.get("/counts", (req, res) => {
+ 
+  const countQuery = `
+    SELECT
+      COUNT(*) AS total,
+      SUM(isQcm = 1) AS qcmQstsCount,
+      SUM(isQcm = 0) AS textQstsCount,
+      SUM(isQcm = 2) AS imgQstsCount
+    FROM question
+  `;
+
+  connection.query(countQuery, (err, results) => {
+    if (err) {
+      console.error("Error while fetching questions:", err);
+      res.status(500).json({ message: "Error while fetching questions" });
+    } else {
+      res.status(200).json(results[0]);
+    }
+  }
+  );
+}
+);
+
+
+
 
 
 module.exports = router; // Export the router
