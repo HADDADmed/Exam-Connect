@@ -12,7 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+require('dotenv').config();
 
 
 const cors = require("cors"); // Import the cors package
@@ -29,7 +29,8 @@ app.use(cors({
 }));
 
 
-// set up the connection to the database
+// checking the connection to the database
+
 const connection = require("./DataBaseConf/MySqlConnection");  
 connection.connect(function (err) {
      if (err) throw err;
@@ -45,6 +46,7 @@ app.use('/public', express.static('public'));
 app.use("/api/questions", require("./routers/questions.router"));
 app.use("/api/users", require("./routers/users.router"));
 app.use("/api/exams", require("./routers/exams.router"));
+app.use("/api/auth", require("./routers/auth.router"));
 
  
 
