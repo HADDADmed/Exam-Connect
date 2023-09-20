@@ -165,32 +165,46 @@ class GlobalService {
                  router.push({ name: componentName });
             }
        }
-  
        showConfirmMessage(
-            message,
-            title = "Are you sure",
-            confirmButtonText = "Yes",
-            cancelButtonText = "No",
-            showCancelButton = true,
-       ) {
-            return Swal.fire({
-                 title: title,
-                 text: message,
-                 showCancelButton: showCancelButton,
-                 confirmButtonColor: "#3085d6",
-                 cancelButtonColor: "#d33",
-                 confirmButtonText: confirmButtonText,
-                 cancelButtonText: cancelButtonText,
-                 backdrop: `
-                 rgba(0,0,123,0.4)
-               `
-   
-  
-            });
+          message,
+          title = "Are you sure",
+          confirmButtonText = "Yes",
+          showCancelButton = true,
+          cancelButtonText = "No",
+         ) {
+          
+          let swalConfig = {
+            title: title,
+            text: message,
+            confirmButtonText: confirmButtonText, // Set confirmButtonText once
+            confirmButtonColor: "#3085d6",
+            backdrop: `
+              rgba(0, 0, 123, 0.4)
+            `,
+          };
+        
+          if (showCancelButton) {
+            swalConfig = {
+              ...swalConfig,
+              showCancelButton: true,
+              cancelButtonText: cancelButtonText, // Include cancelButtonText conditionally
+              cancelButtonColor: "#d33",
+            };
+          }
+        
+          return Swal.fire(swalConfig);
         }
+        
 
-    
+    minutesToHours(miniutes) {
+            return `${Math.floor(miniutes / 60)}:${miniutes % 60}`;
+      }
 
+
+      secondsToHours(seconds) {
+        return `${Math.floor(seconds / 3600)}:${Math.floor(seconds / 60)}:${seconds % 60}`;
+
+      }
 
 
 

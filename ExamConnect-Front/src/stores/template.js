@@ -7,7 +7,7 @@ export const useTemplateStore = defineStore({
     // App vital details
     app: {
       name: "Exam-connect Edition",
-      version: "2.5.0",
+      version: "1.1",
       copyright: new Date().getFullYear(),
     },
 

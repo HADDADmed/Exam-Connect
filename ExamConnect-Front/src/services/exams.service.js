@@ -19,6 +19,7 @@ class ExamsService {
     }
     async createExam(exam) {
         try {
+
            const questionsCount = exam.questions.qcmQuestions + exam.questions.textQuestions + exam.questions.imageQuestions;
           // Fetch all question IDs
           const response = await QuestionsService.getAllQuestionsIds();
@@ -37,13 +38,25 @@ class ExamsService {
           // Create the exam object
           const questions = qcmQuestions.concat(textQuestions, imageQuestions);
                 
-      
+          // usesrs list 
+          const usersSelected = exam.usersSelected;
+
+         //remap the usersSelected array to have only ids 
+
+          usersSelected.map((user) => {
+            return {
+              id: user.id,
+            }
+          });
+
           const examObject = {
             examTitle: exam.examTitle,
             questionsCount: questionsCount,
             startTime: exam.startTime,
             endTime: exam.endTime,
+            duration_minutes: exam.duration_minutes,
             questions: questions,
+            usersSelected: usersSelected,
           };
           
           return await axios.post(API_URL, examObject);

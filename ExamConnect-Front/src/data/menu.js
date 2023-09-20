@@ -88,44 +88,5 @@ export default {
       name: "",
       heading: true,
     },
-    {
-      name: "Ibtissam dashboard",
-      heading: true,
-    },
-    {
-      name: "Les examens",
-      subActivePaths: "/backend/page-packs/elearning",
-      sub: [
-        {
-          name: "Les examens ",
-          to: "backend-elearning-courses",
-        },
-        {
-          name: "Les questions des examens",
-          to: "backend-elearning-course",
-        },
-      ],
-    },
-    {
-      name: "Créer un examen",
-      to: "backend-tables-responsive",
-    },
-    {
-      name: "Créer des questions",
-      to: "backend-dashboard",
-    },
-
-    {
-      name: "La liste des utilisateurs",
-      to: "backend-tables-helpers",
-    },
-    {
-      name: "Authentification",
-      to: "backend-form-layouts",
-    },
-    {
-      name: "Connexion",
-      to: "backend-form-input-groups",
-    },
   ]
 };
