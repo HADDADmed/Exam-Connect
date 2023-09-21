@@ -1,6 +1,7 @@
 import axios from "axios";
 import GlobalService from "./global.service";
 
+ 
 const API_URL = "http://localhost:3000/api/questions/";
 
 class QuestionsService {
@@ -30,7 +31,7 @@ class QuestionsService {
         examId: question.examId,
       };
     } else if(question.isQcm === 1) {
-      console.log("ERROR : isQcm is not 0 or 1 or 2");
+      console.log("ERROR : isQcm is not 0 or 1 or 2"); 
     }
 
     axios

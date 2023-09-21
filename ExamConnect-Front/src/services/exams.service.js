@@ -77,8 +77,26 @@ class ExamsService {
       }
 
 
+        checkAutorisationToExam(exam_id) 
+        {
+          const accessToken = localStorage.getItem("accessToken");
+          if (!accessToken) {
+            console.log("no accessToken !");
+            return 
+          }
+          axios.defaults.headers.common["Authorization"] = "JWT " + accessToken;
+          return axios.get(API_URL + "checkAutorisationToExam/"+exam_id);
+        }
 
-
+        startOrEnd(exam_id,startOrEnd){
+          const accessToken = localStorage.getItem("accessToken");
+          if (!accessToken) {
+            console.log("no accessToken !");
+            return 
+          }
+          axios.defaults.headers.common["Authorization"] = "JWT " + accessToken;
+          return axios.get(API_URL + "userexamStatus/"+exam_id,{params:{startOrEnd:startOrEnd}});
+        }
       
 }
 

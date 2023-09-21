@@ -4,7 +4,7 @@ import { useRouter , useRoute} from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 import AuthService from "@/services/auth.service";
 import GlobalService from "../../../services/global.service";
-
+import ExamsService from "../../../services/exams.service";
 // Vuelidate, for more info and examples you can check out https://github.com/vuelidate/vuelidate
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
@@ -64,13 +64,33 @@ async function onSubmit() {
         if (response.data.user.isAdmin) {
           router.push({ name: "examconnect-exams-exam" , query: { exam_id: exam_id_live }});
         }else{
+          //check if the user are authorized to access the exam
+          
+          ExamsService.checkAutorisationToExam(exam_id_live).then(
+            (response) => {
+              // check the status of the response
+              if(response.status === 200){
+                if(response.data.user_exam.status == "notStarted"){
+                  router.push({ name: "examconnect-user-exam" , query: { exam_id: exam_id_live }});
+                }else{
+                  router.push({ name: "examSubmited" });
+                }
+              }else{
+                router.push({ name: "user-error-404" });
+              }
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+
           router.push({ name: "examconnect-user-exam" , query: { exam_id: exam_id_live }});
         }
       }else{
         if (response.data.user.isAdmin) {
           router.push({ name: "examconnect-dashboard" });
         }else{
-          // router.push({ name: "no-exam-found-page" });
+           router.push({ name: "user-error-404" });
         }
       }
     },

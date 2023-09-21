@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import Toaster from '@meforma/vue-toaster';
+import mitt from 'mitt'
 
 // You can use the following starter router instead of the default one as a clean starting point
 // import router from "./router/starter";
@@ -18,6 +19,7 @@ import router from "./router";
  
  // Bootstrap framework
  import * as bootstrap from "bootstrap";
+import axios from "axios";
  window.bootstrap = bootstrap;
  
  // Craft new application
@@ -39,6 +41,30 @@ app.use(Toaster);
 
 app.config.globalProperties.globalService = GlobalService
 
+const emitter = mitt()
+
+app.config.globalProperties.emitter = emitter
+
+
+const accessToken = localStorage.getItem("accessToken");
+axios.defaults.headers.common['Authorization'] = 'JWT '+ accessToken;
+const isAdmin = localStorage.getItem("isAdmin");
+// Set up Axios interceptor to handle 401 responses
+axios.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        if(!isAdmin) router.push({ name: 'user-error-401' }); // Redirect to the 401 error page
+        else router.push({ name: 'user-error-401' }); // Redirect to the 401 error page
+      }else if(error.response && error.response.status === 404){
+        if(!isAdmin) router.push({ name: 'user-error-404' }); // Redirect to the 401 error page
+        else router.push({ name: 'user-error-403' }); // Redirect to the 401 error page
+     }
+      return Promise.reject(error);
+    }
+  );
 
 
 // ..and finally mount it!

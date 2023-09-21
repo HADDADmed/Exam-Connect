@@ -88,7 +88,7 @@ export default {
                   class="item item-2x item-circle bg-white-10 py-3 my-3 mx-auto"
                 >
                   <h5 style="margin-top: 20px">
-                    <strong>18</strong> users Answer
+                    <strong>{{exam.usersCount }} </strong> user
                   </h5>
                 </div>
                 <div class="fs-sm text-white-75">

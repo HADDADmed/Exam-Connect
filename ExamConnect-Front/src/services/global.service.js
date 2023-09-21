@@ -175,7 +175,7 @@ class GlobalService {
           
           let swalConfig = {
             title: title,
-            text: message,
+            html: message,
             confirmButtonText: confirmButtonText, // Set confirmButtonText once
             confirmButtonColor: "#3085d6",
             backdrop: `

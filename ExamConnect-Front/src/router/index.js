@@ -98,6 +98,21 @@ const routes = [
         name: "examconnect-user-exam",
         component: lazyLoadVue('OneExamPageUser','Exams'),
       },
+      {
+        path: "404",
+        name: "user-error-404",
+        component: lazyLoadVue('404Vue','Erors'),
+      },
+      {
+        path:"401",
+        name:"user-error-401",
+        component: lazyLoadVue('401Vue','Erors'),
+      },
+      {
+        path:"user-error-examSubmited",
+        name:"examSubmited",
+        component: lazyLoadVue('examSubmited','Erors'),
+      }
       
     ],
   },

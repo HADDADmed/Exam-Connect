@@ -52,6 +52,7 @@
     "filepond": "^4.30.4",
     "filepond-plugin-image-preview": "^4.6.11",
     "highlight.js": "^11.8.0",
+    "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.4",
     "simplebar": "^6.2.5",
