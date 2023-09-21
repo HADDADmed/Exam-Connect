@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../DataBaseConf/MySqlConnection");
 
-router.get("/", (req, res) => {
+const verifyToken = require("../middlewares/verifyToken");
+const verifyAdmin = require("../middlewares/verifyAdmin");
+
+router.get("/", verifyAdmin, (req, res) => {
      const query = `
                 SELECT 
                   Exam.id AS exam_id, 
@@ -13,7 +16,8 @@ router.get("/", (req, res) => {
                   Exam.createdAt,
                   Exam.duration_minutes,
                   question.id AS question_id, 
-                  question.isQcm 
+                  question.isQcm,
+                  (SELECT COUNT(*) FROM exam_user WHERE exam_id = Exam.id ) AS usersCount
                 FROM Exam 
                 INNER JOIN exam_question ON Exam.id = exam_question.exam_id
                 INNER JOIN question ON exam_question.question_id = question.id
@@ -37,6 +41,7 @@ router.get("/", (req, res) => {
                               startTime: row.startTime,
                               endTime: row.endTime,
                               duration_minutes: row.duration_minutes,
+                              usersCount: row.usersCount,
                               createdAt: row.createdAt,
                               questions: [
                                    {
@@ -59,7 +64,7 @@ router.get("/", (req, res) => {
 
 // create a new exam
 
-router.post("/", (req, res) => {
+router.post("/", verifyAdmin, (req, res) => {
      const exam = req.body;
      const questions = exam.questions;
 
@@ -73,7 +78,13 @@ router.post("/", (req, res) => {
     `;
      connection.query(
           query,
-          [exam.examTitle, exam.questionsCount, exam.startTime, exam.endTime, exam.duration_minutes],
+          [
+               exam.examTitle,
+               exam.questionsCount,
+               exam.startTime,
+               exam.endTime,
+               exam.duration_minutes,
+          ],
           (err, results) => {
                if (err) {
                     console.error("Error while creating exam:", err);
@@ -177,7 +188,7 @@ router.post("/", (req, res) => {
 
 // get exam by id
 
-router.get("/exam/:id", (req, res) => {
+router.get("/exam/:id", verifyToken, (req, res) => {
      const examId = req.params.id;
      const query = `
     SELECT 
@@ -223,12 +234,13 @@ router.get("/exam/:id", (req, res) => {
                          startTime: results[0].startTime,
                          endTime: results[0].endTime,
                          duration_minutes: results[0].duration_minutes,
+                         usersCount: 0,
                          createdAt: results[0].createdAt,
+
                          users: [],
                          questions: [],
                     };
                     results.forEach((row) => {
-                          
                          const existingQuestion = exam.questions.find(
                               (question) =>
                                    question.question_id === row.question_id
@@ -259,8 +271,7 @@ router.get("/exam/:id", (req, res) => {
                                    )
                                    .options.push({
                                         option_id: row.option_id,
-                                        question_text:
-                                    row.option_question_text,
+                                        question_text: row.option_question_text,
                                         isTrue: row.isTrue,
                                    });
                          }
@@ -275,8 +286,6 @@ router.get("/exam/:id", (req, res) => {
                                    exam_status: row.status,
                               });
                          }
-
-
                     });
 
                     // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
@@ -294,11 +303,156 @@ router.get("/exam/:id", (req, res) => {
                          textQuestions,
                          imageQuestions
                     );
-
+                     exam.usersCount = exam.users.length;
                     res.status(200).json(exam);
                }
           }
      });
 });
+
+router.get("/checkAutorisationToExam/:id", verifyToken, (req, res) => {
+     const user_id = req.user.id;
+     const exam_id = req.params.id;
+     const query = `
+     SELECT id from exam where id = ? ;
+     `;
+     connection.query(query, [exam_id], (err, results1) => {
+          if (err) {
+               console.error("Error while fetching exam:", err);
+               res.status(500).json({ message: "Error while fetching exam" });
+          } else {
+               if (results1.length === 0) {
+                    console.log("exam not found");
+                    res.status(404).json({ message: "Exam not found" });
+               } else {
+                    const query = `
+                    SELECT * from exam_user where exam_id = ? and user_id = ? ;
+                    `;
+                    connection.query(
+                         query,
+                         [exam_id, user_id],
+                         (err, results) => {
+                              if (err) {
+                                   console.error(
+                                        "Error while fetching exam:",
+                                        err
+                                   );
+                                   res.status(500).json({
+                                        message: "Error while fetching exam",
+                                   });
+                              } else {
+                                   if (results.length === 0) {
+                                         res.status(401).json({
+                                             message: "Unauthorized",
+                                        });
+                                        
+                                   } else {
+                                        console.log("Authorized");
+                                        console.log(results[0]);
+                                        res.status(200).json({
+                                             message: "Authorized",
+                                             user_exam : results[0]
+                                        });
+                                   }
+                              }
+                         }
+                    );
+               }
+          }
+     });
+});
+
+
+router.get('/userexamStatus/:id', verifyToken, (req, res) => {
+     const user_id = req.user.id;
+     const exam_id = req.params.id;
+     const startOrEnd = req.query.startOrEnd;
+     
+     console.log('startOrEnd');
+     console.log(startOrEnd);
+      console.log('user_id');
+     console.log(user_id);
+     console.log('exam_id');
+     console.log(exam_id);
+
+
+     const selectIdQuery = `
+     SELECT id as exam_user_id from exam_user  WHERE exam_id = ? AND user_id = ? ;
+     `;
+
+    const insertQuery = `
+     INSERT INTO exam_user_status 
+     (status_id, exam_user_id)
+     VALUES
+     (?, ?);
+     `;
+     const updateQuery = `
+          UPDATE exam_user 
+          SET status = ?
+          WHERE id = ? ;
+     `;
+
+
+     
+
+
+     connection.query(selectIdQuery, [exam_id, user_id], (err, results) => {
+          if (err) {
+               console.error("Error while fetching exam:", err);
+               res.status(500).json({ message: "Error while fetching exam" });
+          } else {
+               if (results.length === 0) {
+                    console.log("exam not found");
+                    res.status(404).json({ message: "Exam not found" });
+               } else {
+                    const exam_user_id = results[0].exam_user_id;
+                    connection.query(
+                         insertQuery,
+                         [startOrEnd == 'start'?2:3, exam_user_id],
+                         (err, results) => {
+                              if (err) {
+                                   console.error(
+                                        "Error while fetching exam:",
+                                        err
+                                   );
+                                   res.status(500).json({
+                                        message: "Error while fetching exam",
+                                   });
+                              } else {
+                                   connection.query(
+                                        updateQuery,
+                                        [startOrEnd == 'start' ?"inProgress":"pendingReview", exam_user_id],
+                                        (err, results) => {
+                                             if (err) {
+                                                  console.error(
+                                                       "Error while fetching exam:",
+                                                       err
+                                                  );
+                                                  res.status(500).json({
+                                                       message:
+                                                            "Error while fetching exam",
+                                                  });
+                                             } else {
+                                                  res.status(200).json({
+                                                       message:
+                                                            "exam status updated successfuly",
+                                                  });
+                                             }
+                                        }
+                                   );
+                              }
+                         }
+                    );
+               }
+          }
+     });
+
+
+}
+);
+
+
+
+
 
 module.exports = router;

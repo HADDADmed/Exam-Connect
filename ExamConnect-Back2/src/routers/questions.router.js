@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../DataBaseConf/MySqlConnection");
 const multer = require("multer");
+const verifyAdmin = require("../middlewares/verifyAdmin");
+
 
 const path = require("path"); // Import the 'path' module
 function getfullDateTime(date1) {

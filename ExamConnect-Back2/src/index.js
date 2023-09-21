@@ -2,7 +2,7 @@
 
 const bodyParser = require("body-parser") ;
 
-
+const verifyAdmin = require("./middlewares/verifyAdmin");
 
 
 const express = require("express");
@@ -43,10 +43,11 @@ connection.connect(function (err) {
 app.use('/public', express.static('public'));
 
 
-app.use("/api/questions", require("./routers/questions.router"));
-app.use("/api/users", require("./routers/users.router"));
+app.use("/api/questions",verifyAdmin,require("./routers/questions.router"));
+app.use("/api/users",verifyAdmin, require("./routers/users.router"));
 app.use("/api/exams", require("./routers/exams.router"));
-app.use("/api/auth", require("./routers/auth.router"));
+app.use("/api/userAnswers", require("./routers/userAnswers.router"));
+app.use("/api/auth",require("./routers/auth.router"));
 
  
 
