@@ -155,6 +155,15 @@ export default {
                                                             <button
                                                                  type="button"
                                                                  class="btn btn-sm rounded rounded-pill btn-alt-secondary"
+                                                                 @click="()=>{
+                                                                      $router.push({
+                                                                           name: 'examconnect-exam-results',
+                                                                           query: {
+                                                                                exam_id: exam_id,
+                                                                                user_id: user.id,
+                                                                           },
+                                                                      });
+                                                                 }"
                                                             >
                                                                 Review
                                                             </button>

@@ -31,8 +31,25 @@ export default {
                );
                this.stopTimer();
                this.emitter.emit("examSubmited", { msg: "examSubmited" });
-               this.$router.push({ name: "examSubmited" });
-          },
+               ExamsService.startOrEnd(this.exam_id, "end").then((res) => {
+                    this.globalService.toasterShowSuccess(
+                         "Exam submited successfuly !"
+                    );
+                    this.globalService
+                         .showConfirmMessage(
+                              "<strong>Time is over !</strong> <br> the exam  submited successfuly your exam is pending Review !",
+                              "Time is over !",
+                              "leave !",
+                              false
+                         )
+                         .then((res) => {
+                              if (res.value) {
+                                   this.$router.push({ name: "examSubmited" });
+                                   this.shouldShowConfirm = false; // Allow the page refresh
+                              }
+                         });
+               });
+           },
           handleBeforeUnload(event) {
                if (this.shouldShowConfirm) {
                     this.leaving();

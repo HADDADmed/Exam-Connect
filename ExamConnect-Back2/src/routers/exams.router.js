@@ -236,7 +236,6 @@ router.get("/exam/:id", verifyToken, (req, res) => {
                          duration_minutes: results[0].duration_minutes,
                          usersCount: 0,
                          createdAt: results[0].createdAt,
-
                          users: [],
                          questions: [],
                     };
@@ -428,11 +427,14 @@ router.get('/userexamStatus/:id', verifyToken, (req, res) => {
                                                        "Error while fetching exam:",
                                                        err
                                                   );
-                                                  res.status(500).json({
+                                                   res.status(500).json({
                                                        message:
                                                             "Error while fetching exam",
                                                   });
                                              } else {
+                                                  console.log(
+                                                       "exam status updated successfuly"
+                                                  );
                                                   res.status(200).json({
                                                        message:
                                                             "exam status updated successfuly",

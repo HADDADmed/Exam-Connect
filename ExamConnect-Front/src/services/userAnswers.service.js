@@ -9,9 +9,18 @@ class UserAnswersService {
         return axios.post(API_URL, answer);
     }
 
-    getAllAnswersByExamId(exam_id, user_id) {
-        return axios.post(API_URL + "user/"+ user_id +"/exam"+exam_id);
+    getAllAnswersByExamUserId(exam_id, user_id) {
+        return axios.get(API_URL + "user/"+ user_id +"/exam/"+exam_id);
     }
+
+    submitReview(review , exam_id, user_id) {
+        return axios.post(API_URL + "review", {
+            review: review,
+            user_id: user_id,
+            question_id: exam_id,
+        });
+    }
+
 }
 
 export default new UserAnswersService();

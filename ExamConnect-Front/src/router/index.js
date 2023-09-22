@@ -77,6 +77,10 @@ const routes = [
         path: "Users/examconnect-users-create",
         name: "examconnect-users-create",
         component: lazyLoadVue('CreateUser','Users'),
+      },{
+        path: "Users/examconnect-exam-results",
+        name: "examconnect-exam-results",
+        component: lazyLoadVue('ExamResult','Exams'),
       },
     ]
 

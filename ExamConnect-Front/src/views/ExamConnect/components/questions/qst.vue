@@ -15,6 +15,7 @@ export default {
           index: Number,
           isAdmin: Boolean,
           question: Object,
+          result: Boolean,
      },
      components: {
           imgQst,
@@ -33,7 +34,7 @@ export default {
 <template>
      <BaseBlock :title="'Question ' + (index + 1) + ' :'">
           <template v-if="options" #options>
-               <div
+               <div v-if="!result"
                     class="space-x-1 bg-primary-light btn btn-sm rounded rounded-pill"
                >
                     <div class="dropdown d-inline-block">
@@ -105,21 +106,29 @@ export default {
                     </div>
                </div>
           </template>
-          <div class="mb-4" v-html="question.question_text"></div>
-
+         
+               <div class="mb-4" v-html="question.question_text"></div>
+                
+     
+          <div>
+                    {{question.question_id  }}
+               </div>
           <div v-if="question.isQcm === 1">
                <qcmQst
                     :question="question"
                     :isAdmin="userVue"
                     :index="index"
+                    :result="result"
                ></qcmQst>
           </div>
 
           <div v-else-if="question.isQcm === 2">
+              
                <imgQst
                     :question="question"
                     :isAdmin="userVue"
                     :index="index"
+                    :result="result"
                ></imgQst>
           </div>
 
@@ -128,6 +137,7 @@ export default {
                     :question="question"
                     :isAdmin="userVue"
                     :index="index"
+                    :result="result"
                ></txtQst>
           </div>
      </BaseBlock>
