@@ -7,7 +7,7 @@ const exams_controller = require("../controllers/exams.controller");
 
 router.get("/", verifyAdmin, exams_controller.getAllExams);
 router.post("/", verifyAdmin, exams_controller.createExam);
-router.get("/exam/:id", verifyToken, exams_controller.getExamById);
+router.get("/exam/:id", exams_controller.getExamById);
 router.get(
      "/checkAuth/:id",
      verifyToken,

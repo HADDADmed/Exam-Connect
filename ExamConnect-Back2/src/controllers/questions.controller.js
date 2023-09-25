@@ -212,23 +212,25 @@ exports.getQuestionsCountByType = asyncHandler(async   (req, res,next) => {
    }
    );
 
-
-exports.deleteQuestion = asyncHandler(async   (req, res) => {
-     const question_id = req.params.id;
-     const query = "DELETE FROM question WHERE id = ?";
-     const query2 = "DELETE FROM questionOption WHERE question_id = ?";
-     connection.query(query2, [question_id], (err, result) => {
-       if (err) {
-         console.error(
-           "Erreur lors de la suppression des options d'une question:",
-           err
-         );
-         res.status(500).json({
-           message: "Erreur lors de la suppression des options d'une question",
-         });
-       } else {
-         res.status(200).json({ message: "Question deleted successfuly !" });
-       }
-     });
-   });
-
+   exports.deleteQuestion = asyncHandler(async (req, res) => {
+    const question_id = req.params.id;
+    const query = "DELETE FROM question WHERE id = ?";
+    try {
+      connection.query(query, [question_id], (err, result) => {
+        if (err) {
+          console.error("DATABASE ERROR:", err); // Log the error
+          res.status(500).json({
+            message: "Erreur lors de la suppression des options d'une question",
+          });
+        } else {
+          res.status(200).json({ message: "Question deleted successfully!" });
+        }
+      });
+    } catch (error) {
+      console.error("INTERNAL SERVER ERROR:", error); // Log the error
+      res.status(500).json({
+        message: "Internal server error while deleting the question",
+      });
+    }
+  });
+  

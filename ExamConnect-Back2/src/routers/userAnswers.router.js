@@ -10,6 +10,13 @@ router.get(
      "/user/:user_id/exam/:exam_id",
      userAnswers_controller.getUserAnswerByUserIdAndExamId
 );
+router.post("/review", userAnswers_controller.submitReview);
+router.post("/finalReview", userAnswers_controller.submitFinalReview);
+
 
 //
 module.exports = router;
+
+
+
+ 
