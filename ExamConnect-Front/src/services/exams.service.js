@@ -5,8 +5,11 @@
 
 import axios from "axios";
 import QuestionsService from "./questions.service";
+import GlobalService from './global.service';
+const API_URL = GlobalService.getApiUrl() + 'exams/';
 
-const API_URL = "http://localhost:3000/api/exams/";
+
+
 
 class ExamsService {
 
@@ -85,7 +88,7 @@ class ExamsService {
             return 
           }
           axios.defaults.headers.common["Authorization"] = "JWT " + accessToken;
-          return axios.get(API_URL + "checkAutorisationToExam/"+exam_id);
+          return axios.get(API_URL + "checkAuth/"+exam_id);
         }
 
         startOrEnd(exam_id,startOrEnd){

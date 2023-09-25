@@ -1,15 +1,14 @@
 <script>
 import userAnswersService from "../../../../../services/userAnswers.service";
-export default {
+ export default {
      data() {
           return {
-               IMAGES_PATH: "http://localhost:3000/public/images/",
+               IMAGES_PATH: this.globalService.getImagesUrl() ,
                answer: {
                     exam_id: this.$route.query.exam_id,
                     question_id: "",
                     questionOption_id: "",
-                    isTrue: "",
-               },
+                },
           };
      },
      props: {
@@ -22,20 +21,14 @@ export default {
      methods: {
           onAnswerChange(question_id, option_id, isTrue) {
                this.answer.questionOption_id = option_id;
-               this.answer.isTrue = isTrue;
-          },
+           },
      },
      mounted() {
           this.answer.question_id = this.question.question_id;
-          this.emitter.on("examSubmited", (data) => {
-               console.log(
-                    "question_id : " +
-                         this.answer.question_id +
-                         " option_id : " +
-                         this.answer.questionOption_id +
-                         " isTrue : " +
-                         this.answer.isTrue
-               );
+          console.log(this.answer);
+           this.emitter.on("examSubmited", (data) => {
+               console.log("examSubmited listned img: ");
+               console.log(this.answer);
                userAnswersService.createAnswer(this.answer);
           });
      },
@@ -229,9 +222,6 @@ export default {
 
      <div v-else>
           <div class="d-flex flex-wrap justify-content-center">
-               <div class="result d-flex justify-content-center">
-                    <span class="passed"> 1 / 1 </span>
-               </div>
                <div
                     v-for="(option, index2) in question.options"
                     class="m-5"
@@ -285,55 +275,7 @@ export default {
                          </div>
                     </div>
 
-                    <div style="width: 250px">
-                         <div class="form-check form-block">
-                              <input
-                                   type="radio"
-                                   class="form-check-input"
-                                   :id="
-                                        'example-radio-block-' +
-                                        option.option_id
-                                   "
-                                   :checked="option.isChecked"
-                                   disabled
-                              />
-                              <label
-                                   class="form-check-label"
-                                   :class="
-                                        option.iChecked && option.isTrue
-                                             ? 'checked'
-                                             : option.iChecked == 1 &&
-                                               option.isTrue == 0
-                                             ? 'nonchecked'
-                                             : ''
-                                   "
-                                   :for="
-                                        'example-radio-block-' +
-                                        option.option_id
-                                   "
-                              >
-                                   <span
-                                        class="d-block fw-normal text-center my-3"
-                                   >
-                                        <div style="width: 100%; height: 200px">
-                                             <!-- Set a fixed height for uniformity -->
-                                             <img
-                                                  style="
-                                                       width: 100%;
-                                                       height: 100%;
-                                                       object-fit: cover;
-                                                  "
-                                                  :src="
-                                                       IMAGES_PATH +
-                                                       option.question_text
-                                                  "
-                                                  alt="image"
-                                             />
-                                        </div>
-                                   </span>
-                              </label>
-                         </div>
-                    </div>
+                    
                </div>
                <div class="d-flex flex-wrap justify-content-center"></div>
           </div>

@@ -1,18 +1,41 @@
 
 
 import { createToaster } from "@meforma/vue-toaster";
-
- import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import router from "@/router"; // Import your Vue Router instance
 
 
 class GlobalService {
      
+     constructor() {
+          this.toaster = createToaster({});
+          this.BACK_END_PORT = 3000;
+          this.BACK_END_IP = "localhost";
+          this.BACK_END_URL = `http://${this.BACK_END_IP}:${this.BACK_END_PORT}/`;
+          this.API_URL = `${this.BACK_END_URL}api/`;
+          this.IMAGES_URL = `${this.BACK_END_URL}public/images/`;
+     }
 
-    constructor() {
-        this.toaster = createToaster({});
-   }
+     getBackEndPort() {
+          return this.BACK_END_PORT;
+     }
 
+     getBackEndIp() {
+          return this.BACK_END_IP;
+     }
+
+     getBackEndUrl() {
+          return this.BACK_END_URL;
+     }
+
+     getApiUrl() {
+          return this.API_URL;
+     }
+
+     getImagesUrl() {
+          return this.IMAGES_URL;
+     }
+    
     getCurrentTime() {
         return new Date().toLocaleTimeString();
     }

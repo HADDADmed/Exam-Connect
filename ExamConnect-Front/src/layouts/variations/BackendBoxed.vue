@@ -43,13 +43,10 @@ store.mainContent({ mode: "boxed" });
         <!-- Logo -->
         
       <div  class="fw-semibold fs-5 tracking-wider text-dual me-3">
-
         Exam
         <span class="fw-normal">Connect</span>
       </div>
         <!-- END Logo -->
-
-        
         <!-- END Notifications Dropdown -->
       </div>
       <!-- END Left Section -->

@@ -104,10 +104,6 @@ export default {
                     //This is test for Push with query params ?
                }
                QuestionsService.createQuestion(this.question);
-               this.$router.push({
-                    name: "examconnect-questions-list",
-                    query: { filterTearm: this.question.isQcm },
-               });
           },
           previewImage(event, index) {
                var input = event.target;

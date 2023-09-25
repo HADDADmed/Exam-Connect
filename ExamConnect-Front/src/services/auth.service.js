@@ -1,9 +1,8 @@
 
 
 import axios from 'axios';
- 
-const API_URL = 'http://localhost:3000/api/auth/';
-
+import GlobalService from './global.service';
+const API_URL = GlobalService.getApiUrl() + 'auth/';
 
 
 class  AuthService {

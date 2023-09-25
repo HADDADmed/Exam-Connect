@@ -1,7 +1,7 @@
 <script>
 import ExamsService from "../../../services/exams.service";
 import qstVue from "../components/questions/qst.vue";
-import ClipboardJS from 'clipboard';
+import ClipboardJS from "clipboard";
 
 export default {
      data() {
@@ -10,7 +10,7 @@ export default {
                hover: false,
                exam: {},
                currentTime: new Date().toLocaleTimeString(),
-               IMAGES_PATH: "http://localhost:3000/public/images/",
+               IMAGES_PATH: this.globalService.getImagesUrl(),
                generatedLink: "",
           };
      },
@@ -21,29 +21,33 @@ export default {
           setInterval(() => {
                this.currentTime = new Date().toLocaleTimeString();
           }, 1000);
-     },methods: {
-          copyLink() {
-      const clipboard = new ClipboardJS('#button-addon2', {
-        text: () => this.generatedLink,
-      });
-
-      clipboard.on('success', () => {
-        this.globalService.toasterShowSuccess('Link copied to clipboard');
-        clipboard.destroy(); // Cleanup after the copy is successful
-      });
-
-      clipboard.on('error', () => {
-        this.globalService.toasterShowError('Failed to copy link to clipboard');
-        clipboard.destroy(); // Cleanup after an error
-      });
-
-     },generateLink(){
-        console.log("generatedLink");
-        console.log(this.$route);
-          this.generatedLink = "http://localhost:5173/#/?exam_id_live="+this.exam_id;
-
      },
+     methods: {
+          copyLink() {
+               const clipboard = new ClipboardJS("#button-addon2", {
+                    text: () => this.generatedLink,
+               });
 
+               clipboard.on("success", () => {
+                    this.globalService.toasterShowSuccess(
+                         "Link copied to clipboard"
+                    );
+                    clipboard.destroy(); // Cleanup after the copy is successful
+               });
+
+               clipboard.on("error", () => {
+                    this.globalService.toasterShowError(
+                         "Failed to copy link to clipboard"
+                    );
+                    clipboard.destroy(); // Cleanup after an error
+               });
+          },
+          generateLink() {
+               console.log("generatedLink");
+               console.log(this.$route);
+               this.generatedLink =
+                    "http://localhost:5173/#/?exam_id_live=" + this.exam_id;
+          },
      },
      components: {
           qstVue,
@@ -86,8 +90,8 @@ export default {
                                    <table class="table table-sm table-vcenter">
                                         <thead>
                                              <tr>
-                                                  <th  style="width: 50px">
-                                                    &nbsp;&nbsp;&nbsp;&nbsp;#ID
+                                                  <th style="width: 50px">
+                                                       &nbsp;&nbsp;&nbsp;&nbsp;#ID
                                                   </th>
                                                   <th>fullName</th>
                                                   <th style="width: 15%">
@@ -100,32 +104,33 @@ export default {
                                                   <th
                                                        class="text-center"
                                                        scope="row"
-                                                  ><div
-                                                                 class="spinner-grow spinner-grow-sm  text-success"
-                                                                 role="status"
-                                                                 v-if="
-                                                                      user.exam_status ===
-                                                                      'inProgress'"
+                                                  >
+                                                       <div
+                                                            class="spinner-grow spinner-grow-sm text-success"
+                                                            role="status"
+                                                            v-if="
+                                                                 user.exam_status ===
+                                                                 'inProgress'
+                                                            "
+                                                       >
+                                                            <span
+                                                                 class="visually-hidden"
+                                                                 >Loading...</span
                                                             >
-                                                                 <span
-                                                                      class="visually-hidden"
-                                                                      >Loading...</span
-                                                                 >
-                                                            </div>
-                                                            <span v-else>
-                                                              &nbsp;&nbsp;&nbsp;&nbsp;
-                                                            </span >
+                                                       </div>
+                                                       <span v-else>
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                                       </span>
                                                        {{ user.id }}
                                                   </th>
-                                         <td class="fw-semibold fs-sm">
+                                                  <td class="fw-semibold fs-sm">
                                                        <a
                                                             href="javascript:void(0)"
                                                        >
                                                             {{ user.fullName }}
                                                        </a>
                                                   </td>
-                                                  <td style=" ">
-                                                    
+                                                  <td style="">
                                                        <div
                                                             class="badge rounded rounded-pill"
                                                             :class="
@@ -133,12 +138,13 @@ export default {
                                                                  'notStarted'
                                                                       ? 'bg-warning'
                                                                       : user.exam_status ===
-                                                                        'inProgress'
+                                                                             'inProgress' ||
+                                                                        user.exam_status ===
+                                                                             'passed'
                                                                       ? 'bg-success'
                                                                       : 'bg-danger'
                                                             "
-                                                        >
-                                                           
+                                                       >
                                                             {{
                                                                  user.exam_status
                                                             }}
@@ -147,7 +153,11 @@ export default {
                                                   <td
                                                        v-if="
                                                             user.exam_status ===
-                                                            'pendingReview'
+                                                                 'pendingReview' ||
+                                                            user.exam_status ===
+                                                                 'failed' ||
+                                                            user.exam_status ===
+                                                                 'passed'
                                                        "
                                                        class="text-center"
                                                   >
@@ -155,51 +165,66 @@ export default {
                                                             <button
                                                                  type="button"
                                                                  class="btn btn-sm rounded rounded-pill btn-alt-secondary"
-                                                                 @click="()=>{
-                                                                      $router.push({
-                                                                           name: 'examconnect-exam-results',
-                                                                           query: {
-                                                                                exam_id: exam_id,
-                                                                                user_id: user.id,
-                                                                           },
-                                                                      });
-                                                                 }"
+                                                                 @click="
+                                                                      () => {
+                                                                           $router.push(
+                                                                                {
+                                                                                     name: 'examconnect-exam-results',
+                                                                                     query: {
+                                                                                          exam_id: exam_id,
+                                                                                          user_id: user.id,
+                                                                                     },
+                                                                                }
+                                                                           );
+                                                                      }
+                                                                 "
                                                             >
-                                                                Review
+                                                                 <span
+                                                                      v-if="
+                                                                           user.exam_status ===
+                                                                           'pendingReview'
+                                                                      "
+                                                                 >
+                                                                      Review
+                                                                 </span>
+                                                                 <span v-else>
+                                                                      Result
+                                                                 </span>
                                                             </button>
                                                        </div>
                                                   </td>
                                              </tr>
                                         </tbody>
                                    </table>
+                              </BaseBlock>
+                              <div
+                                   class="btn btn-success rounded rounded-pill mb-5"
+                                   @click="generateLink()"
+                              >
+                                   Genreate link for this exam
+                              </div>
 
-
-                                  </BaseBlock>
-                                  <div class="btn btn-success rounded rounded-pill mb-5" @click="generateLink()">
-                                          Genreate link for this exam 
-                                  </div>
-
-                                  <div>
-                                        <div class="input-group mb-3">
-                                              <input
-                                                  type="text"
-                                                  class="form-control"
-                                                  placeholder="Recipient's username"
-                                                  aria-label="Recipient's username"
-                                                  aria-describedby="button-addon2"
-                                                  v-model="generatedLink"
-                                                  readonly
-                                              />
-                                              <button
-                                                  class="btn btn-outline-secondary"
-                                                  type="button"
-                                                  id="button-addon2"
-                                                  @click="copyLink()"
-                                              >
-                                                  Copy
-                                              </button>
-                                        </div>
-                                  </div>
+                              <div>
+                                   <div class="input-group mb-3">
+                                        <input
+                                             type="text"
+                                             class="form-control"
+                                             placeholder="Recipient's username"
+                                             aria-label="Recipient's username"
+                                             aria-describedby="button-addon2"
+                                             v-model="generatedLink"
+                                             readonly
+                                        />
+                                        <button
+                                             class="btn btn-outline-secondary"
+                                             type="button"
+                                             id="button-addon2"
+                                             @click="copyLink()"
+                                        >
+                                             Copy
+                                        </button>
+                                   </div>
+                              </div>
                               <!-- END Small Table -->
                          </div>
                     </div>
@@ -218,7 +243,6 @@ export default {
           </div>
      </div>
 
-    
      <!-- END Page Content -->
 </template>
 
