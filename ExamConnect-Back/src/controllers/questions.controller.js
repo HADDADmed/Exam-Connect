@@ -5,6 +5,8 @@ const connection = require("../DataBaseConf/MySqlConnection");
 
 exports.getAllQuestions = asyncHandler(async (req,res,next) => {
      // select all the questions from the database with all there options
+
+
      const query = `
                    SELECT
                        q.id,
@@ -233,4 +235,4 @@ exports.getQuestionsCountByType = asyncHandler(async   (req, res,next) => {
       });
     }
   });
-  
+

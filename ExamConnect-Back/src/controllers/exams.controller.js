@@ -65,6 +65,39 @@ exports.getAllExams = asyncHandler(async (req,res,next) => {
 
 exports.getExamById = asyncHandler(async (req,res,next) => {
      const examId = req.params.id;
+     const user = req.user;
+
+
+     if(!user.isAdmin){
+
+          const selectQuery = `
+          SELECT
+          status
+          FROM exam_user
+          WHERE user_id = ? AND exam_id = ?;
+          `
+          await connection.query(selectQuery, [user.id, examId], (err, results) => {
+               if (err) {
+                    console.error("Error while fetching exam:", err);
+                    res.status(500).json({ message: "Error while fetching exam" });
+               } else {
+                    if (results.length === 0) {
+                         console.log("exam not found");
+                         res.status(404).json({ message: "Exam not found" });
+                         return;
+                    } else {
+                         const status = results[0].status;
+                         if(status === "pendingReview" ){
+                              console.log("Unauthorized");
+                              res.status(401).json({ message: "Unauthorized" });
+                              return;
+                         }
+                    }
+               }
+          }
+          );
+     }
+
      const query = `
                SELECT
                     Exam.id AS exam_id,
@@ -94,95 +127,98 @@ exports.getExamById = asyncHandler(async (req,res,next) => {
                WHERE Exam.id = ?;
                `;
 
-       await connection.query(query, [examId], (err, results) => {
-          if (err) {
-               console.error("Error while fetching exam:", err);
-               res.status(500).json({ message: "Error while fetching exam" });
-          } else {
-               if (results.length === 0) {
-                    res.status(404).json({ message: "Exam not found" });
-               } else {
-                    const exam = {
-                         exam_id: results[0].exam_id,
-                         ExamTitle: results[0].ExamTitle,
-                         questionsCount: results[0].questionsCount,
-                         startTime: results[0].startTime,
-                         endTime: results[0].endTime,
-                         duration_minutes: results[0].duration_minutes,
-                         usersCount: 0,
-                         createdAt: results[0].createdAt,
+          await connection.query(query, [examId], (err, results) => {
+                    if (err) {
+                         console.error("Error while fetching exam:", err);
+                         res.status(500).json({ message: "Error while fetching exam" });
+                    } else {
+                         if (results.length === 0) {
+                              res.status(404).json({ message: "Exam not found" });
+                         } else {
+                              const exam = {
+                                   exam_id: results[0].exam_id,
+                                   ExamTitle: results[0].ExamTitle,
+                                   questionsCount: results[0].questionsCount,
+                                   startTime: results[0].startTime,
+                                   endTime: results[0].endTime,
+                                   duration_minutes: results[0].duration_minutes,
+                                   usersCount: 0,
+                                   createdAt: results[0].createdAt,
 
-                         users: [],
-                         questions: [],
-                    };
-                    results.forEach((row) => {
-                         const existingQuestion = exam.questions.find(
-                              (question) =>
-                                   question.question_id === row.question_id
-                         );
-                         if (!existingQuestion) {
-                              exam.questions.push({
-                                   question_id: row.question_id,
-                                   question_text: row.question_text,
-                                   isQcm: row.isQcm,
-                                   options: [],
-                              });
-                         }
-                         const existingOption = exam.questions
-                              .find(
-                                   (question) =>
-                                        question.question_id === row.question_id
-                              )
-                              .options.find(
-                                   (option) =>
-                                        option.option_id === row.option_id
-                              );
-                         if (!existingOption) {
-                              exam.questions
-                                   .find(
+                                   users: [],
+                                   questions: [],
+                              };
+                              results.forEach((row) => {
+                                   const existingQuestion = exam.questions.find(
                                         (question) =>
-                                             question.question_id ===
-                                             row.question_id
-                                   )
-                                   .options.push({
-                                        option_id: row.option_id,
-                                        question_text: row.option_question_text,
-                                        isTrue: row.isTrue,
-                                   });
-                         }
-                         const existingUser = exam.users.find(
-                              (user) => user.id === row.user_id
-                         );
-                         if (!existingUser) {
-                              exam.users.push({
-                                   id: row.user_id,
-                                   fullName: row.fullName,
-                                   email: row.email,
-                                   exam_status: row.status,
+                                             question.question_id === row.question_id
+                                   );
+                                   if (!existingQuestion) {
+                                        exam.questions.push({
+                                             question_id: row.question_id,
+                                             question_text: row.question_text,
+                                             isQcm: row.isQcm,
+                                             options: [],
+                                        });
+                                   }
+                                   const existingOption = exam.questions
+                                        .find(
+                                             (question) =>
+                                                  question.question_id === row.question_id
+                                        )
+                                        .options.find(
+                                             (option) =>
+                                                  option.option_id === row.option_id
+                                        );
+                                   if (!existingOption) {
+                                        exam.questions
+                                             .find(
+                                                  (question) =>
+                                                       question.question_id ===
+                                                       row.question_id
+                                             )
+                                             .options.push({
+                                                  option_id: row.option_id,
+                                                  question_text: row.option_question_text,
+                                                  isTrue: row.isTrue,
+                                             });
+                                   }
+                                   const existingUser = exam.users.find(
+                                        (user) => user.id === row.user_id
+                                   );
+                                   if (!existingUser) {
+                                        exam.users.push({
+                                             id: row.user_id,
+                                             fullName: row.fullName,
+                                             email: row.email,
+                                             exam_status: row.status,
+                                        });
+                                   }
                               });
+
+                              // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
+
+                              const qcmQuestions = exam.questions.filter(
+                                   (question) => question.isQcm === 1
+                              );
+                              const textQuestions = exam.questions.filter(
+                                   (question) => question.isQcm === 0
+                              );
+                              const imageQuestions = exam.questions.filter(
+                                   (question) => question.isQcm === 2
+                              );
+                              exam.questions = qcmQuestions.concat(
+                                   textQuestions,
+                                   imageQuestions
+                              );
+                               exam.usersCount = exam.users.length;
+                              res.status(200).json(exam);
                          }
-                    });
+                    }
+               });
 
-                    // sorting the questions by isQcm  (qcm questions first) (text questions second) (image questions third)
 
-                    const qcmQuestions = exam.questions.filter(
-                         (question) => question.isQcm === 1
-                    );
-                    const textQuestions = exam.questions.filter(
-                         (question) => question.isQcm === 0
-                    );
-                    const imageQuestions = exam.questions.filter(
-                         (question) => question.isQcm === 2
-                    );
-                    exam.questions = qcmQuestions.concat(
-                         textQuestions,
-                         imageQuestions
-                    );
-                     exam.usersCount = exam.users.length;
-                    res.status(200).json(exam);
-               }
-          }
-     });
+
 }
 );
 

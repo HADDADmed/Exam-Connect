@@ -82,11 +82,20 @@ exports.createUserAnswer = asyncHandler(async (req, res, next) => {
 
 exports.getUserAnswerByUserIdAndExamId = asyncHandler(
      async (req, res, next) => {
+
           const user_id = req.params.user_id;
           const exam_id = req.params.exam_id;
 
+          const user = req.user;
+          if(!user.isAdmin){
+               if(user_id != user.id){
+                    res.status(401).json({ message: "Unauthorized" });
+                    return;
+               }
+          }
+
           const selectQuery = `
-            SELECT 
+            SELECT
                 userAnswer.id AS userAnswer_id,
                 userAnswer.user_id,
                 userAnswer.exam_id,
@@ -107,11 +116,11 @@ exports.getUserAnswerByUserIdAndExamId = asyncHandler(
                 exam_user.id AS exam_user_id
             FROM userAnswer
             LEFT JOIN Exam ON userAnswer.exam_id = Exam.id
-            LEFT JOIN user ON userAnswer.user_id = user.id 
+            LEFT JOIN user ON userAnswer.user_id = user.id
             LEFT JOIN question ON userAnswer.question_id = question.id
             LEFT JOIN questionOption ON userAnswer.question_id = questionOption.question_id
             LEFT JOIN exam_user ON userAnswer.exam_id = exam_user.exam_id
-            WHERE userAnswer.user_id = ? AND userAnswer.exam_id = ? and exam_user.user_id = ? AND exam_user.exam_id = ? ;   
+            WHERE userAnswer.user_id = ? AND userAnswer.exam_id = ? and exam_user.user_id = ? AND exam_user.exam_id = ? ;
         `;
 
           connection.query(
@@ -261,7 +270,7 @@ exports.getUserAnswerByUserIdAndExamId = asyncHandler(
                               }
                          }
 
-                          
+
                          // calculate notAnsweredQuestions
                          if (
                               question.isQcm === 0 &&
@@ -291,7 +300,7 @@ exports.submitReview = asyncHandler(async (req, res, next) => {
      const question_id = userAnswer.question_id;
      const review = userAnswer.review;
 
-     
+
      if (review == null) {
           res.json({ message: "review is null" });
           return;
@@ -313,7 +322,7 @@ exports.submitReview = asyncHandler(async (req, res, next) => {
 
 
 exports.submitFinalReview = asyncHandler(async (req, res, next) => {
-    
+
      const exam_user_id = req.body.exam_user_id;
      const exam_id = req.body.exam_id;
      const user_id = req.body.user_id;
@@ -335,7 +344,7 @@ exports.submitFinalReview = asyncHandler(async (req, res, next) => {
                          }
                     );
           }
-          
+
 
      );
 }
