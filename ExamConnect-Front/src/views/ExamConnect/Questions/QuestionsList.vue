@@ -8,7 +8,7 @@ export default {
       questionsFiltred: [],
       orderSearch: false,
       filterTearm: this.$route.query.filterTearm,
-      IMAGES_PATH: "http://localhost:3000/public/images/",
+      IMAGES_PATH: this.globalService.getImagesUrl(),
       spiner: true,
     };
   },
@@ -32,6 +32,12 @@ export default {
     },
   },
   mounted() {
+     //listen to event
+     this.emitter.on("questionDeleted", (data) => {
+      console.log("questionDeleted listned: " + data.id);
+      this.questions = this.questions.filter((q) => q.id != data.id);
+      this.questionsFiltred = this.questionsFiltred.filter((q) => q.id != data.id);
+    });
     this.fetchQuestions();
     setTimeout(() => {
       this.spiner = false;

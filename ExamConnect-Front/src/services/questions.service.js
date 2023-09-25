@@ -1,8 +1,6 @@
 import axios from "axios";
-import GlobalService from "./global.service";
-
- 
-const API_URL = "http://localhost:3000/api/questions/";
+import GlobalService from './global.service';
+const API_URL = GlobalService.getApiUrl() + 'questions/';
 
 class QuestionsService {
   getAllQuestions() {
@@ -53,32 +51,33 @@ class QuestionsService {
 
             // Send the FormData to the backend with the appropriate endpoint
             axios
-              .post(API_URL + "imageQuestion", formData, {
+              .post(API_URL + "/img", formData, {
                 headers: {
                   "Content-Type": "multipart/form-data", // Important to set the content type
                 },
               })
               .then((response) => {
-                counter++;
-                console.log(response);
-              })
+                counter++; 
+               })
               .catch((error) => {
                 console.log(error);
               });
           });
-
-          GlobalService.toasterShowSuccess('Question with '+counter+' images created successfully !');
         }
+        GlobalService.toasterShowSuccess('Question created successfully !');
+        GlobalService.routerPush("examconnect-questions-list",null,{ filterTearm: questionObj.isQcm })
       })
       .catch((error) => {
         console.log(error);
       });
-
-
   }
 
   getQuestionsCountsByType() {
     return axios.get(API_URL + "counts");
+  }
+
+  deleteQuestionById(id) {
+    return axios.delete(API_URL + id);
   }
 
   

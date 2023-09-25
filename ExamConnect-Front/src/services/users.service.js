@@ -1,7 +1,6 @@
 import axios from "axios";
- 
-const API_URL = "http://localhost:3000/api/users/";
-
+import GlobalService from './global.service';
+const API_URL = GlobalService.getApiUrl() + 'users/';
 
 
 

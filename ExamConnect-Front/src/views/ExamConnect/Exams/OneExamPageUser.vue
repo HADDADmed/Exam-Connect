@@ -11,7 +11,7 @@ export default {
                timer: null,
                timerEnd: false,
                currentTime: new Date().toLocaleTimeString(),
-               IMAGES_PATH: "http://localhost:3000/public/images/",
+               IMAGES_PATH: this.globalService.getImagesUrl(),
                shouldShowConfirm: true,
                timerInterval: null,
                userAnswers: [

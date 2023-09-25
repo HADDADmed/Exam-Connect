@@ -26,25 +26,19 @@ export default {
      },
      mounted() {
           this.answer.question_id = this.question.question_id;
-          this.question.options.forEach((option) => {
-               if (option.isChecked) {
+            this.question.options.forEach((option) => {
+               if (option.isChecked){
                     this.answer.questionPassed = 'failed'
                     if(option.isTrue){
                          this.answer.questionPassed = 'passed';
                          return
-                    }
+                     }
                }
           });
 
           this.emitter.on("examSubmited", (data) => {
-               console.log(
-                    "question_id : " +
-                         this.answer.question_id +
-                         " option_id : " +
-                         this.answer.questionOption_id +
-                         " isTrue : " +
-                         this.answer.isTrue
-               );
+               console.log("examSubmited listned qcm: ");
+               console.log(this.answer);
                userAnswersService.createAnswer(this.answer);
           });
      },
@@ -149,9 +143,6 @@ export default {
 
      <div v-else>
           <div class="m-5">
-               <div class="result d-flex justify-content-center">
-                    <span class="passed"> 1 / 1 </span>
-               </div>
                <div v-for="(option, index2) in question.options" class="m-3">
                     <div>
                          <div

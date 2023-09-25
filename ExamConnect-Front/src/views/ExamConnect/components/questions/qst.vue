@@ -3,6 +3,7 @@ questions
 import imgQst from "./questionsPartials/imgQst.vue";
 import qcmQst from "./questionsPartials/qcmQst.vue";
 import txtQst from "./questionsPartials/txtQst.vue";
+import QuestionsService from "../../../../services/questions.service";
 export default {
      data() {
           return {
@@ -27,8 +28,22 @@ export default {
                this.options = true;
                this.userVue = true;
           }
-     },
+     },methods: {
+     deleteQuestion(id) {
+      QuestionsService.deleteQuestionById(id).then(
+        (response) => {
+          // emit event to parent
+          this.emitter.emit("questionDeleted", { id: id });
+           console.log("questionDeleted befor : " + id);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+         },
 };
+
 </script>
 
 <template>
@@ -57,22 +72,7 @@ export default {
                          >
                               <a
                                    @click="
-                                        () => {
-                                             console.log('edit');
-                                        }
-                                   "
-                                   class="dropdown-item fw-medium d-flex align-items-center justify-content-center"
-                                   href="javascript:void(0)"
-                                   v-if="!exam_id"
-                              >
-                                   <i class="fa-solid fa-pen-to-square"></i>
-                                   &nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                              </a>
-                              <a
-                                   @click="
-                                        () => {
-                                             console.log('delete');
-                                        }
+                                      deleteQuestion(question.id)
                                    "
                                    class="dropdown-item fw-medium d-flex align-items-center justify-content-center"
                                    href="javascript:void(0)"
@@ -110,9 +110,7 @@ export default {
                <div class="mb-4" v-html="question.question_text"></div>
                 
      
-          <div>
-                    {{question.question_id  }}
-               </div>
+          
           <div v-if="question.isQcm === 1">
                <qcmQst
                     :question="question"

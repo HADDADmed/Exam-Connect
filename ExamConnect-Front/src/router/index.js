@@ -95,7 +95,7 @@ const routes = [
   */
   {
     path: "/examconnect-user",
-    component: lazyLoadLayout('BackendBoxed'),
+    component: lazyLoadLayout('Backend'),
     children: [
       {
         path: "examconnect-user-exam",
