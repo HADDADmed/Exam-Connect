@@ -55,6 +55,7 @@ async function onSubmit() {
                localStorage.setItem("accessToken", response.data.accessToken);
                localStorage.setItem("user", JSON.stringify(response.data.user));
                GlobalService.toasterShowSuccess("Login successful !");
+
                if (exam_id_live) {
                     if (response.data.user.isAdmin) {
                          router.push({
@@ -66,52 +67,7 @@ async function onSubmit() {
 
                          ExamsService.checkAutorisationToExam(
                               exam_id_live
-                         ).then(
-                              (response) => {
-                                   // check the status of the response
-                                   if (response.status === 200) {
-                                        if (
-                                             response.data.user_exam.status ==
-                                             "notStarted"
-                                        ) {
-                                             router.push({
-                                                  name: "examconnect-user-exam",
-                                                  query: {
-                                                       exam_id: exam_id_live,
-                                                  },
-                                             });
-                                        } else if (
-                                             response.data.user_exam.status ==
-                                             "pendingReview"
-                                        ) {
-                                             router.push({
-                                                  name: "examSubmited",
-                                             });
-                                        } else if (
-                                             response.data.user_exam.status ==
-                                                  "passed" ||
-                                             response.data.user_exam.status ==
-                                                  "failed"
-                                        ) {
-                                             router.push({
-                                                  name: "examconnect-exam-results",
-                                                  query: {
-                                                       exam_id: response.data
-                                                            .user_exam.exam_id,
-                                                       user_id: response.data
-                                                            .user_exam.user_id,
-                                                  },
-                                             });
-                                        }
-                                   } else {
-                                        router.push({ name: "user-error-404" });
-                                   }
-                              },
-                              (error) => {
-                                   console.log(error);
-                              }
-                         );
-
+                         )
                          router.push({
                               name: "examconnect-user-exam",
                               query: { exam_id: exam_id_live },
@@ -121,7 +77,7 @@ async function onSubmit() {
                     if (response.data.user.isAdmin) {
                          router.push({ name: "examconnect-dashboard" });
                     } else {
-                         router.push({ name: "user-error-404" });
+                         router.push({ name: "examconnect-dashboard" });
                     }
                }
           },

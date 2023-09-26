@@ -286,7 +286,7 @@ export default {
                                                        >
                                                             #ID
                                                        </th>
-                                                       <th>Date Time of Change</th>
+                                                       <th>Date of Change</th>
                                                        <th
                                                             class="d-none d-sm-table-cell"
                                                             style="width: 15%"

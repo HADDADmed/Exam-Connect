@@ -1,25 +1,8 @@
 <script setup>
-import { ref } from "vue";
-import { useTemplateStore } from "@/stores/template";
-
+ import { useTemplateStore } from "@/stores/template";
 import BaseLayout from "@/layouts/BaseLayout.vue";
-import BaseNavigation from "@/components/BaseNavigation.vue";
 
-// Grab example data
-import notifications from "@/data/notifications";
-
-// Grab menu navigation arrays
-import menu from "@/data/menu";
-
-const navigation = menu.boxed;
-
-// Main store
 const store = useTemplateStore();
-
-// Reactive variables
-const mobileNav = ref(false);
-const baseSearchTerm = ref("");
-
 // Set default elements for this layout
 store.setLayout({
   header: true,

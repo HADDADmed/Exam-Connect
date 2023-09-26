@@ -26,7 +26,7 @@
                          style="
                               font: bold 25px/1.4 Helvetica, Verdana, sans-serif; /* Adjusted line-height */
                          "
-                         :to="{ name: 'out' }"
+                         :to="{ name: 'examconnect-authentication' }"
                          class="btn btn-primary rounded rounded-pill link-fx m-5"
                          >Log out</RouterLink
                     >

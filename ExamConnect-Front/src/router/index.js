@@ -2,23 +2,26 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import NProgress from "nprogress/nprogress.js";
 
-function guardMyRoutes(to, from, next) {
-     const user = JSON.parse(localStorage.getItem("user"));
-     const accessToken = localStorage.getItem("accessToken");
 
-     // Check if the user is logged in
-     if (user && accessToken) {
-         next();
-     } else if (to.name === "examconnect-authentication") {
-         // Allow access to the 'examconnect-authentication' route but clear local storage
-         localStorage.clear();
-         next();
-     } else {
-         // Redirect to the 'examconnect-authentication' route if not logged in
-         next({ name: "examconnect-authentication" });
+
+
+function guardMyRoutes(to, from, next) {
+     if(to.name !== 'examconnect-authentication' && !localStorage.getItem('accessToken')){
+          if(to.query.exam_id_live){
+               next({ name: 'examconnect-authentication', query: { exam_id_live: to.query.exam_id_live } })
+          }
+         else next({ name: 'examconnect-authentication' })
+     }else if(to.name === 'examconnect-authentication' && localStorage.getItem('accessToken')){
+         localStorage.removeItem('accessToken')
+         localStorage.removeItem('user')
+         next({ name: 'examconnect-authentication' })
+     }else{
+         next()
      }
  }
+ 
 
+ 
 
 function lazyLoadVue(view, folder = null) {
      if (folder)

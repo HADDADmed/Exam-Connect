@@ -25,7 +25,7 @@ export default {
           };
      },
      methods: {
-          sendEvent() {
+          sendEvent(name = "examSubmited") {
                this.globalService.toasterShowSuccess(
                     "Exam submited successfuly !"
                );
@@ -44,7 +44,7 @@ export default {
                          )
                          .then((res) => {
                               if (res.value) {
-                                   this.$router.push({ name: "examSubmited" });
+                                   this.$router.push({ name: name });
                                    this.shouldShowConfirm = false; // Allow the page refresh
                               }
                          });
@@ -88,6 +88,9 @@ export default {
           ExamsService.getExamById(this.exam_id).then((res) => {
                this.exam = res.data;
                this.timer = Number(this.exam.duration_minutes) * 60 - 1;
+          });
+          this.emitter.on("examSubmitednav", (data) => {
+               this.sendEvent(data.name);
           });
 
           this.globalService

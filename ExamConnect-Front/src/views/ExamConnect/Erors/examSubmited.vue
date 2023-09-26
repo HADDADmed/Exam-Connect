@@ -10,7 +10,7 @@
             <!-- Error Header -->
             <h1 class="display-1 fw-bolder text-smooth">Exam submited !</h1>
             <h2 class="h4 fw-normal text-muted mb-5">
-              We are sorry but the exam you are looking for you already submited it !...
+              Your exam is submitted succssefuly and is pending admin Review
             </h2>
           </div>
         </div>
@@ -26,9 +26,17 @@
                          style="
                               font: bold 25px/1.4 Helvetica, Verdana, sans-serif; /* Adjusted line-height */
                          "
-                         :to="{ name: 'out' }"
+                         :to="{ name: 'examconnect-authentication' }"
                          class="btn btn-primary rounded rounded-pill link-fx m-5"
                          >Log out</RouterLink
+                    >or 
+                    <RouterLink
+                         style="
+                              font: bold 25px/1.4 Helvetica, Verdana, sans-serif; /* Adjusted line-height */
+                         "
+                         :to="{ name: 'examconnect-dashboard' }"
+                         class="btn btn-success rounded rounded-pill link-fx m-5"
+                         >Go to dashboard</RouterLink
                     >
                     <!-- END Error Footer -->
                </div>

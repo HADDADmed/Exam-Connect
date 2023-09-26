@@ -74,7 +74,7 @@ export default {
                          :value="question.userAnswerText"
                     ></textarea>
                </div>
-               <div v-if="question.isTrue == null && isAdmin ">
+               <div v-if="question.isTrue == null && isAdmin && result ">
                     <div
                          v-if="answer.review == null"
                          class="d-flex justify-content-around"
