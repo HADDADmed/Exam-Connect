@@ -363,11 +363,11 @@ exports.checkAuthorizationToExam = asyncHandler(async (req,res,next) => {
                     res.status(404).json({ message: "Exam not found" });
                } else {
                     const query = `
-                    SELECT * from exam_user where exam_id = ? and user_id = ? ;
+                    SELECT * from exam_user where user_id = ? ;
                     `;
                     connection.query(
                          query,
-                         [exam_id, user_id],
+                         [user_id],
                          (err, results) => {
                               if (err) {
                                    console.error(
@@ -384,12 +384,29 @@ exports.checkAuthorizationToExam = asyncHandler(async (req,res,next) => {
                                         });
 
                                    } else {
-                                        console.log("Authorized");
-                                        console.log(results[0]);
-                                        res.status(200).json({
-                                             message: "Authorized",
-                                             user_exam : results[0]
-                                        });
+
+                                        // check if there is en exam_user row with the exam_id and the user_id
+                                        const exam_user = results.find(
+                                             (exam_user) =>
+                                                  exam_user.exam_id == exam_id
+                                        );
+
+                                        if (!exam_user) {
+                                             res.status(401).json({
+                                                  message: "Unauthorized",
+                                             });
+                                        } else {
+                                             res.status(200).json({
+                                                  message: "Authorized",
+                                                  user_exam: exam_user,
+                                                  all_user_exams: results,
+                                             });
+                                        }
+                                        
+
+
+
+
                                    }
                               }
                          }
@@ -476,4 +493,143 @@ exports.changeUserExamStatus = asyncHandler(async (req,res,next) => {
 }
 );
 
+
+
+exports.getAllUserExams = asyncHandler(async (req,res,next) => {
+     
+     const selectQuery = `
+     SELECT
+     user.id AS user_id,
+     user.fullName,
+     user.email,
+     exam.id AS exam_id,
+     exam.ExamTitle,
+     exam.duration_minutes,
+     exam_user.status,
+     exam_user.createdAt
+     FROM exam_user
+     LEFT JOIN user ON exam_user.user_id = user.id
+     LEFT JOIN exam ON exam_user.exam_id = exam.id;
+     `;
+
+     try {
+         connection.query(selectQuery, (err, results) => {
+               if (err) {
+                    console.error("Error while fetching exams:", err);
+                    res.status(500).json({ message: "Error while fetching exams" });
+               } else {
+                    let users = results;
+                     
+                    // sorting the users by status (pendingReview first) (inProgress second) (notStarted third) (passed fourth) (failed fifth)
+                    const pendingReviewUsers = users.filter(
+                         (user) => user.status === "pendingReview"
+                    );
+                    const inProgressUsers = users.filter(
+                         (user) => user.status === "inProgress"
+                    );
+                    const notStartedUsers = users.filter(
+                         (user) => user.status === "notStarted"
+                    );
+                    const passedUsers = users.filter(
+                         (user) => user.status === "passed"
+                    );
+                    const failedUsers = users.filter(
+                         (user) => user.status === "failed"
+                    );
+                    users = pendingReviewUsers.concat(
+                         inProgressUsers,
+                         notStartedUsers,
+                         passedUsers,
+                         failedUsers
+                    );
+
+                    res.status(200).json(users);
+
+               }
+          });
+     } catch (err) {
+          console.error("Error while fetching exams:", err);
+          res.status(500).json({ message: "Error while fetching exams" });
+     }
+}
+);
+
+     
+
+exports.getUserExamsById = asyncHandler(async (req,res,next) => {
+     const user_id = req.user.id ;
+     const selectQuery = `
+               SELECT
+               user.id AS user_id,
+               user.fullName,
+               user.email,
+               exam.id AS exam_id,
+               exam.ExamTitle,
+               exam.duration_minutes,
+               exam_user.status,
+               exam_user.createdAt
+               FROM exam_user
+               LEFT JOIN user ON exam_user.user_id = user.id
+               LEFT JOIN exam ON exam_user.exam_id = exam.id
+               WHERE user.id = ?;
+     `;
+
+     try {
+         connection.query(selectQuery, [user_id], (err, results) => {
+               if (err) {
+                    console.error("Error while fetching exams:", err);
+                    res.status(500).json({ message: "Error while fetching exams" });
+               } else {
+                    let user = {
+                         id: user_id,
+                         fullName: results[0].fullName,
+                         email: results[0].email,
+                         exams: [],
+                    };
+                    results.forEach((row) => {
+                         user.exams.push({
+                              exam_id: row.exam_id,
+                              ExamTitle: row.ExamTitle,
+                              duration_minutes: row.duration_minutes,
+                              status: row.status,
+                              createdAt: row.createdAt,
+                         });
+                    });
+                    // sorting the exams by status (pendingReview first) (inProgress second) (notStarted third) (passed fourth) (failed fifth)
+                    const pendingReviewExams = user.exams.filter(
+                         (exam) => exam.status === "pendingReview"
+                    );
+                    const inProgressExams = user.exams.filter(
+                         (exam) => exam.status === "inProgress"
+                    );
+                    const notStartedExams = user.exams.filter(
+                         (exam) => exam.status === "notStarted"
+                    );
+                    const passedExams = user.exams.filter(
+                         (exam) => exam.status === "passed"
+                    );
+                    const failedExams = user.exams.filter(
+                         (exam) => exam.status === "failed"
+                    );
+                    
+                    user.exams = pendingReviewExams.concat(
+                         inProgressExams,
+                         notStartedExams,
+                         passedExams,
+                         failedExams
+                    );
+
+                    res.status(200).json(user);
+
+               }
+          });
+     } catch (err) {
+          console.error("Error while fetching exams:", err);
+          res.status(500).json({ message: "Error while fetching exams" });
+     }
+}
+);
+
+
+     
 

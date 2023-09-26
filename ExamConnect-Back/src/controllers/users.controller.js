@@ -20,8 +20,7 @@ exports.createUser = asyncHandler(async (req, res,next) => {
 
      const fullName = user.fullName;
      const email = user.email;
-     const passwor = user.password;
-
+     const password = user.password;
      const insertQuery = "INSERT INTO user (fullName, email, password) VALUES (?,?,?)";
      connection.query(insertQuery, [fullName, email, password], (err, rows) => {
          if (err) throw err;
