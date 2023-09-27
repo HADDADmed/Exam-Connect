@@ -3,7 +3,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import Toaster from '@meforma/vue-toaster';
 import mitt from 'mitt'
-
+ 
 // You can use the following starter router instead of the default one as a clean starting point
 // import router from "./router/starter";
 import router from "./router";
@@ -17,6 +17,7 @@ import router from "./router";
  // Template directives
  import clickRipple from "@/directives/clickRipple";
  
+
  // Bootstrap framework
  import * as bootstrap from "bootstrap";
 import axios from "axios";
@@ -46,9 +47,12 @@ const emitter = mitt()
 app.config.globalProperties.emitter = emitter
 
 
-const accessToken = localStorage.getItem("accessToken");
+import { useUserStore } from "./stores/user";
+const userStore = useUserStore();
+const accessToken = GlobalService.getCurrentAccessToken();
+const user = userStore.user;
 axios.defaults.headers.common['Authorization'] = 'JWT '+ accessToken;
-const isAdmin = localStorage.getItem("isAdmin");
+const isAdmin = user.isAdmin;
 // Set up Axios interceptor to handle 401 responses
 axios.interceptors.response.use(
     (response) => {

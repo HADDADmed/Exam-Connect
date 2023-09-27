@@ -121,9 +121,6 @@ export default {
                                                   this.exam_id,
                                                   "end"
                                              ).then((res) => {
-                                                  this.globalService.toasterShowSuccess(
-                                                       "Exam submited successfuly !"
-                                                  );
                                                   this.globalService
                                                        .showConfirmMessage(
                                                             "<strong>Time is over !</strong> <br> the exam  submited successfuly your exam is pending Review !",
@@ -182,16 +179,7 @@ export default {
                     <h1 class="fw-bold mb-2">{{ exam.ExamTitle }}</h1>
                     <h2 class="fs-base lh-base fw-medium text-muted mb-0">
                          <!-- display the time string version -->
-                         this exam start at
-                         {{
-                              globalService.getTimeWithoutSeconds(
-                                   exam.startTime
-                              )
-                         }}
-                         and will end at
-                         {{ globalService.getTimeWithoutSeconds(exam.endTime) }}
-                         in
-                         {{ globalService.getDate(exam.startTime) }}
+                        you have {{ globalService.minutesToHours(exam.duration_minutes) }} to finish the exam
                     </h2>
                </div>
           </div>

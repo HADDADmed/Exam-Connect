@@ -37,8 +37,7 @@ export default {
           });
 
           this.emitter.on("examSubmited", (data) => {
-               console.log("examSubmited listned qcm: ");
-               console.log(this.answer);
+              
                userAnswersService.createAnswer(this.answer);
           });
      },
@@ -86,15 +85,7 @@ export default {
 
           <div v-else class="m-5">
                <div class="m-3">
-                    <div v-if="answer.questionPassed == 'passed'" class="result d-flex justify-content-center">
-                         <span class="passed"> 1 / 1 </span>
-                    </div>
-                    <div v-else-if="answer.questionPassed == 'failed'" class="result d-flex justify-content-center">
-                         <span class="failed"> 0 / 1 </span>
-                    </div>
-                    <div v-else class="result d-flex justify-content-center">
-                         <span class="failed">Not Answerd !</span>
-                    </div>
+                    
                     <div
                          v-for="(option, index2) in question.options"
                          class="m-3"
@@ -109,8 +100,6 @@ export default {
                                                   : option.isChecked == 1 &&
                                                     option.isTrue == 0
                                                   ? 'nonchecked'
-                                                  : option.isTrue == 1
-                                                  ? 'checked'
                                                   : ''
                                         "
                                         :style="
@@ -214,25 +203,25 @@ export default {
 .radio-dot.selected {
      background-color: green;
      border-color: black;
-     box-shadow: 0px 0px 15px 7px green;
+     box-shadow: 0px 0px 2px 2px green;
      transition: background-color 0.3s, box-shadow 0.3s; /* Add transitions for smooth change */
 }
 
 .radio-dot.nonselected {
      /* background-color: #ff7276; */
      border-color: black;
-     box-shadow: 0px 0px 15px red;
+     box-shadow: 0px 0px 2px 2px red;
      transition: background-color 0.3s, box-shadow 0.3s; /* Add transitions for smooth change */
 }
 
 .radio-dot.checked {
      border-color: black;
-     box-shadow: 0px 0px 15px 10px green;
+     box-shadow: 0px 0px 2px 2px green;
      transition: background-color 0.3s, box-shadow 0.3s; /* Add transitions for smooth change */
 }
 .radio-dot.nonchecked {
      border-color: black;
-     box-shadow: 0px 0px 15px 10px red;
+     box-shadow: 0px 0px 2px 2px red;
      transition: background-color 0.3s, box-shadow 0.3s; /* Add transitions for smooth change */
 }
 /* Style label text */

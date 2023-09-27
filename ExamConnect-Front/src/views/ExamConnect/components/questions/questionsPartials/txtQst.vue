@@ -29,8 +29,7 @@ export default {
                this.answer.review = this.question.isTrue == 1 ? 'success' : "failed";
           }
           this.emitter.on("examSubmited", (data) => {
-               console.log("examSubmited listned text: ");
-               console.log(this.answer);
+               
                userAnswersService.createAnswer(this.answer);
           });
 
@@ -97,7 +96,7 @@ export default {
                     </div>
                     
                </div>
-               <div style="display: grid; place-items: center">
+               <div style="display: grid; place-items: center" v-if="question.isTrue == null ">
                          <div v-if="answer.review == 'success'">
                               <i
                                    class="fa fa-check"
