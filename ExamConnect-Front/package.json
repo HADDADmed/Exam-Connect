@@ -39,7 +39,6 @@
     "@popperjs/core": "^2.11.8",
     "@tiptap/starter-kit": "^2.0.3",
     "@tiptap/vue-3": "^2.0.3",
-    "@vue/cli-service": "^5.0.8",
     "@vueform/slider": "^2.1.7",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.3",
@@ -72,6 +71,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/cli-service": "^5.0.8",
     "eslint": "^8.44.0",
     "eslint-plugin-vue": "^9.15.1",
     "sass": "^1.63.6",
