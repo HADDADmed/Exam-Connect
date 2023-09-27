@@ -153,6 +153,12 @@ class ExamsService {
      }
 
      getAllUserExams() {
+          const accessToken = GlobalService.getCurrentAccessToken();
+          if (!accessToken) {
+               console.log("no accessToken !");
+               return;
+          }
+          axios.defaults.headers.common["Authorization"] = "JWT " + accessToken;
           return axios.get(API_URL + "userexams");
      }
 
