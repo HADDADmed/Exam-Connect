@@ -110,9 +110,9 @@ export default {
                                    </td>
                                    <td class="fs-sm">
                                         <a
-                                             :href="`mailto:${user.email}`"
-                                             class="text-body"
-                                        >
+                                             href="javascript:void(1)"
+                                             style="font-size: larger; "
+                                         >
                                              {{ user.email }}
                                         </a>
                                    </td>
