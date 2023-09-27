@@ -29,9 +29,7 @@ export default {
                     (response) => {
                          this.userAnswers = response.data;
                          this.examStatist = response.data.examStatist;
-                         console.log("userAnswers :");
-                         console.log(this.userAnswers);
-
+                         
                          if (
                               this.examStatist.correctQuestions +
                                    this.examStatist.wrongQuestions ==

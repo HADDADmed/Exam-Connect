@@ -17,8 +17,6 @@ const route = useRoute();
 const userStore = useUserStore();
 const exam_id_live = route.query.exam_id_live;
 
-if (exam_id_live) console.log(exam_id_live);
-else console.log("no exam_id_live");
 
 // Input state variables
 const state = reactive({
@@ -55,7 +53,6 @@ async function onSubmit() {
           (response) => {
                userStore.setUser(response.data.user);
                userStore.setAccessToken(response.data.accessToken);
-
                localStorage.setItem("accessToken", response.data.accessToken);
                localStorage.setItem("user", JSON.stringify(response.data.user));
                GlobalService.toasterShowSuccess("Login successful !");

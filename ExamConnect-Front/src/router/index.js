@@ -1,19 +1,16 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import GlobalService from "@/services/global.service";
 import NProgress from "nprogress/nprogress.js";
 
 
 
 
 function guardMyRoutes(to, from, next) {
-     const user = GlobalService.getCurrentUser();
-     const accessToken = GlobalService.getCurrentAccessToken();
-     if(to.name !== 'examconnect-authentication' && !accessToken){
+     if(to.name !== 'examconnect-authentication' && !localStorage.getItem('accessToken')){
           if(to.query.exam_id_live){
                next({ name: 'examconnect-authentication', query: { exam_id_live: to.query.exam_id_live } })
           }
          else next({ name: 'examconnect-authentication' })
-     }else if(to.name === 'examconnect-authentication' && accessToken){
+     }else if(to.name === 'examconnect-authentication' && localStorage.getItem('accessToken')){
          localStorage.removeItem('accessToken')
          localStorage.removeItem('user')
          next({ name: 'examconnect-authentication' })

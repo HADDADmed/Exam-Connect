@@ -37,8 +37,7 @@ export default {
           });
 
           this.emitter.on("examSubmited", (data) => {
-               console.log("examSubmited listned qcm: ");
-               console.log(this.answer);
+              
                userAnswersService.createAnswer(this.answer);
           });
      },

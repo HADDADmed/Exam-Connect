@@ -32,10 +32,9 @@ export default {
      methods: {
           deleteQuestion(id) {
                QuestionsService.deleteQuestionById(id).then(
-                    (response) => {
+                    () => {
                          // emit event to parent
                          this.emitter.emit("questionDeleted", { id: id });
-                         console.log("questionDeleted befor : " + id);
                     },
                     (error) => {
                          console.log(error);

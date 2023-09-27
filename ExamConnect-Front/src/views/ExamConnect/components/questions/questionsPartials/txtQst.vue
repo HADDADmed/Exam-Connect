@@ -29,8 +29,7 @@ export default {
                this.answer.review = this.question.isTrue == 1 ? 'success' : "failed";
           }
           this.emitter.on("examSubmited", (data) => {
-               console.log("examSubmited listned text: ");
-               console.log(this.answer);
+               
                userAnswersService.createAnswer(this.answer);
           });
 

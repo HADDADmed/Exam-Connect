@@ -121,9 +121,6 @@ export default {
                                                   this.exam_id,
                                                   "end"
                                              ).then((res) => {
-                                                  this.globalService.toasterShowSuccess(
-                                                       "Exam submited successfuly !"
-                                                  );
                                                   this.globalService
                                                        .showConfirmMessage(
                                                             "<strong>Time is over !</strong> <br> the exam  submited successfuly your exam is pending Review !",

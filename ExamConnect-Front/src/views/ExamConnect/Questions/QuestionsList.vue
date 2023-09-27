@@ -34,7 +34,6 @@ export default {
   mounted() {
      //listen to event
      this.emitter.on("questionDeleted", (data) => {
-      console.log("questionDeleted listned: " + data.id);
       this.questions = this.questions.filter((q) => q.id != data.id);
       this.questionsFiltred = this.questionsFiltred.filter((q) => q.id != data.id);
     });

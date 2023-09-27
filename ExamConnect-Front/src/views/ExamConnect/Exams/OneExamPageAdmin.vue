@@ -43,8 +43,6 @@ export default {
                });
           },
           generateLink() {
-               console.log("generatedLink");
-               console.log(this.$route);
                this.generatedLink =
                     "http://localhost:5173/#/?exam_id_live=" + this.exam_id;
           },
