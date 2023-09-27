@@ -1,5 +1,6 @@
 <script>
 import { useTemplateStore } from "@/stores/template";
+import { useUserStore } from "@/stores/user";
 import BaseLayout from "@/layouts/BaseLayout.vue";
 
 export default {
@@ -8,7 +9,8 @@ export default {
      },
      data() {
           return {
-               user: JSON.parse(localStorage.getItem("user")),
+               user: this.globalService.getCurrentUser(),
+               userStore: useUserStore(),
                store: useTemplateStore(),
           };
      },

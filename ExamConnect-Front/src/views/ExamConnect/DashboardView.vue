@@ -6,7 +6,7 @@ export default {
      data() {
           return {
                userExams: [],
-               user: JSON.parse(localStorage.getItem("user")),
+               user: this.globalService.getCurrentUser(),
                users: [],
           };
      },

@@ -8,12 +8,13 @@ import ExamsService from "../../../services/exams.service";
 // Vuelidate, for more info and examples you can check out https://github.com/vuelidate/vuelidate
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
+import { useUserStore } from '@/stores/user'; // Replace with the actual path to your store file
 
 // Main store and Router
 const store = useTemplateStore();
 const router = useRouter();
 const route = useRoute();
-
+const userStore = useUserStore();
 const exam_id_live = route.query.exam_id_live;
 
 if (exam_id_live) console.log(exam_id_live);
@@ -52,6 +53,9 @@ async function onSubmit() {
      }
      AuthService.login(state.username, state.password).then(
           (response) => {
+               userStore.setUser(response.data.user);
+               userStore.setAccessToken(response.data.accessToken);
+
                localStorage.setItem("accessToken", response.data.accessToken);
                localStorage.setItem("user", JSON.stringify(response.data.user));
                GlobalService.toasterShowSuccess("Login successful !");
@@ -65,9 +69,7 @@ async function onSubmit() {
                     } else {
                          //check if the user are authorized to access the exam
 
-                         ExamsService.checkAutorisationToExam(
-                              exam_id_live
-                         )
+                         ExamsService.checkAutorisationToExam(exam_id_live);
                          router.push({
                               name: "examconnect-user-exam",
                               query: { exam_id: exam_id_live },

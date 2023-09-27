@@ -8,7 +8,7 @@ export default {
           return {
                exam_id: this.$route.query.exam_id,
                user_id: this.$route.query.user_id,
-               user: JSON.parse(localStorage.getItem("user")),
+               user: this.globalService.getCurrentUser(),
                examStatist: {},
                userAnswers: {},
                loading: false,

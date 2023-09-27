@@ -92,7 +92,7 @@ class ExamsService {
      }
 
      checkAutorisationToExam(exam_id) {
-          const accessToken = localStorage.getItem("accessToken");
+          const accessToken = GlobalService.getCurrentAccessToken();
           if (!accessToken) {
                console.log("no accessToken !");
                return;
@@ -141,7 +141,7 @@ class ExamsService {
      }
 
      startOrEnd(exam_id, startOrEnd) {
-          const accessToken = localStorage.getItem("accessToken");
+          const accessToken = GlobalService.getCurrentAccessToken();
           if (!accessToken) {
                console.log("no accessToken !");
                return;
@@ -158,7 +158,7 @@ class ExamsService {
 
 
      getUserExamsById() {
-          const accessToken = localStorage.getItem("accessToken");
+          const accessToken =  GlobalService.getCurrentAccessToken();
           if (!accessToken) {
                console.log("no accessToken !");
                return;
