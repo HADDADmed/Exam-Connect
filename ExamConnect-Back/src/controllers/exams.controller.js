@@ -10,8 +10,6 @@ exports.getAllExams = asyncHandler(async (req,res,next) => {
                   Exam.id AS exam_id,
                   Exam.ExamTitle,
                   Exam.questionsCount,
-                  Exam.startTime,
-                  Exam.endTime,
                   Exam.createdAt,
                   Exam.duration_minutes,
                   question.id AS question_id,
@@ -103,8 +101,6 @@ exports.getExamById = asyncHandler(async (req,res,next) => {
                     Exam.id AS exam_id,
                     Exam.ExamTitle,
                     Exam.questionsCount,
-                    Exam.startTime,
-                    Exam.endTime,
                     Exam.duration_minutes,
                     Exam.createdAt,
                     question.id AS question_id,
@@ -230,17 +226,15 @@ exports.createExam = asyncHandler(async (req,res,next) => {
 
      const query = `
     INSERT INTO Exam
-    (examTitle, questionsCount, startTime, endTime,duration_minutes)
+    (examTitle, questionsCount ,duration_minutes)
     VALUES
-    (?, ?, ?, ?, ?)
+    (?, ?, ? )
     `;
     await connection.query(
           query,
           [
                exam.examTitle,
                exam.questionsCount,
-               exam.startTime,
-               exam.endTime,
                exam.duration_minutes,
           ],
           (err, results) => {
@@ -417,11 +411,13 @@ exports.checkAuthorizationToExam = asyncHandler(async (req,res,next) => {
 }
 );
 
-exports.changeUserExamStatus = asyncHandler(async (req,res,next) => {
+
+
+//vercel
+exports.changeUserExamStatus = asyncHandler(async (req,res,next) => {   
      const user_id = req.user.id;
      const exam_id = req.params.id;
      const startOrEnd = req.query.startOrEnd;
-
      const selectIdQuery = `
           SELECT id as exam_user_id from exam_user  WHERE exam_id = ? AND user_id = ? ;
           `;
@@ -436,8 +432,6 @@ exports.changeUserExamStatus = asyncHandler(async (req,res,next) => {
           SET status = ?
           WHERE id = ? ;
      `;
-
-
     await connection.query(selectIdQuery, [exam_id, user_id], (err, results) => {
           if (err) {
                console.error("Error while fetching exam:", err);
@@ -500,7 +494,7 @@ exports.getAllUserExams = asyncHandler(async (req,res,next) => {
      const selectQuery = `
      SELECT
      user.id AS user_id,
-     user.fullName,
+     user.fullName, 
      user.email,
      exam.id AS exam_id,
      exam.ExamTitle,
