@@ -65,16 +65,8 @@ export default {
                     <h1 class="fw-bold mb-2">{{ exam.ExamTitle }}</h1>
                     <h2 class="fs-base lh-base fw-medium text-muted mb-0">
                          <!-- display the time string version -->
-                         this exam start at
-                         {{
-                              globalService.getTimeWithoutSeconds(
-                                   exam.startTime
-                              )
-                         }}
-                         and will end at
-                         {{ globalService.getTimeWithoutSeconds(exam.endTime) }}
-                         in
-                         {{ globalService.getDate(exam.startTime) }}
+                        this exam duration is {{globalService.minutesToHours( exam.duration_minutes )}}
+                        
                     </h2>
                </div>
           </div>
@@ -209,7 +201,7 @@ export default {
                                         <input
                                              type="text"
                                              class="form-control"
-                                             placeholder="Recipient's username"
+                                             placeholder="The generate link will be here"
                                              aria-label="Recipient's username"
                                              aria-describedby="button-addon2"
                                              v-model="generatedLink"

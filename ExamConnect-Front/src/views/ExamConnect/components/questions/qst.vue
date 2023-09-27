@@ -28,28 +28,29 @@ export default {
                this.options = true;
                this.userVue = true;
           }
-     },methods: {
-     deleteQuestion(id) {
-      QuestionsService.deleteQuestionById(id).then(
-        (response) => {
-          // emit event to parent
-          this.emitter.emit("questionDeleted", { id: id });
-           console.log("questionDeleted befor : " + id);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-    }
-         },
+     },
+     methods: {
+          deleteQuestion(id) {
+               QuestionsService.deleteQuestionById(id).then(
+                    (response) => {
+                         // emit event to parent
+                         this.emitter.emit("questionDeleted", { id: id });
+                         console.log("questionDeleted befor : " + id);
+                    },
+                    (error) => {
+                         console.log(error);
+                    }
+               );
+          },
+     },
 };
-
 </script>
 
 <template>
      <BaseBlock :title="'Question ' + (index + 1) + ' :'">
           <template v-if="options" #options>
-               <div v-if="!result"
+               <div
+                    v-if="!result"
                     class="space-x-1 bg-primary-light btn btn-sm rounded rounded-pill"
                >
                     <div class="dropdown d-inline-block">
@@ -71,9 +72,7 @@ export default {
                               aria-labelledby="dropdown-recent-orders-filters"
                          >
                               <a
-                                   @click="
-                                      deleteQuestion(question.id)
-                                   "
+                                   @click="deleteQuestion(question.id)"
                                    class="dropdown-item fw-medium d-flex align-items-center justify-content-center"
                                    href="javascript:void(0)"
                                    style="color: #ff0000"
@@ -106,11 +105,29 @@ export default {
                     </div>
                </div>
           </template>
-         
-               <div class="mb-4" v-html="question.question_text"></div>
-                
-     
-          
+
+          <div class="d-flextest">
+               <div
+                    class="question-text mb-4"
+                    v-html="question.question_text"
+               ></div>
+
+               <div
+                    class="result-container"
+                    v-if="question.isTrue == 0 || question.isTrue == 1"
+               >
+                    <div v-if="question.isTrue" class="result passed">
+                         <span style="font-size: 50px">1 / 1</span>
+                    </div>
+                    <div v-else-if="question.isTrue == 0" class="result failed">
+                         <span style="font-size: 50px">0 / 1</span>
+                    </div>
+                    <div v-else class="result pending-review">
+                         <span style="font-size: 50px">Pending review</span>
+                    </div>
+               </div>
+          </div>
+
           <div v-if="question.isQcm === 1">
                <qcmQst
                     :question="question"
@@ -121,7 +138,6 @@ export default {
           </div>
 
           <div v-else-if="question.isQcm === 2">
-              
                <imgQst
                     :question="question"
                     :isAdmin="userVue"
@@ -141,4 +157,40 @@ export default {
      </BaseBlock>
 </template>
 
-<style></style>
+<style>
+
+.d-flextest {
+    display: flex;
+    align-items: center; /* Center vertically within the container */
+}
+
+.question-text {
+    flex: 1; /* Allow the question text div to take up available space */
+}
+
+.result-container {
+    margin-left: 20px;  
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center result vertically */
+    margin: 10px 200px 10px 10px;
+}
+
+.result {
+    text-align: center;
+}
+
+.passed {
+    color: green;
+}
+
+.failed {
+    color: red;
+}
+
+.pending-review {
+    color: orange;
+}
+
+</style>

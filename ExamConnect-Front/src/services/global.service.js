@@ -220,7 +220,14 @@ class GlobalService {
         
 
     minutesToHours(miniutes) {
-            return `${Math.floor(miniutes / 60)}:${miniutes % 60}`;
+
+               
+                    if(Math.floor(miniutes / 60) === 0)
+                    return `${miniutes % 60} minutes`;
+                    else if(miniutes % 60 === 0)
+                    return `${Math.floor(miniutes / 60)} hours`;
+                    else
+                    return `${Math.floor(miniutes / 60)} hours and ${miniutes % 60} minutes`;    
       }
 
 

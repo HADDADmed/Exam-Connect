@@ -67,8 +67,6 @@ class ExamsService {
                const examObject = {
                     examTitle: exam.examTitle,
                     questionsCount: questionsCount,
-                    startTime: exam.startTime,
-                    endTime: exam.endTime,
                     duration_minutes: exam.duration_minutes,
                     questions: questions,
                     usersSelected: usersSelected,

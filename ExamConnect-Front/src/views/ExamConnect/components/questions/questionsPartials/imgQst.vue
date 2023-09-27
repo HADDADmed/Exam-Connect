@@ -7,6 +7,7 @@ export default {
                answer: {
                     exam_id: this.$route.query.exam_id,
                     question_id: "",
+                    questionPassed: 'notAnswered',
                     questionOption_id: "",
                },
           };
@@ -25,6 +26,15 @@ export default {
      },
      mounted() {
           this.answer.question_id = this.question.question_id;
+          this.question.options.forEach((option) => {
+               if (option.isChecked){
+                    this.answer.questionPassed = 'failed'
+                    if(option.isTrue){
+                         this.answer.questionPassed = 'passed';
+                         return
+                     }
+               }
+          });
           this.emitter.on("examSubmited", (data) => {
                userAnswersService.createAnswer(this.answer);
           });
@@ -34,7 +44,12 @@ export default {
 
 <template>
      <div v-if="isAdmin">
+
+        
+
+          
           <div class="d-flex flex-wrap justify-content-center">
+
                <div
                     v-if="!result"
                     v-for="(option, index2) in question.options"
@@ -63,8 +78,8 @@ export default {
                                              "
                                              :style="
                                                   option.isTrue
-                                                       ? ' box-shadow: 0px 0px 50px 15px green;' /* Change styles when true */
-                                                       : ' box-shadow: 0px 0px 20px red;'
+                                                       ? '  ' /* Change styles when true */
+                                                       : ''
                                              "
                                         >
                                              <!-- Set a fixed height for uniformity -->
@@ -87,32 +102,17 @@ export default {
                                                   v-if="option.isTrue"
                                                   style="
                                                        position: absolute;
-                                                       top: 10px;
-                                                       right: 10px;
+                                                       top: -38px;
+                                                       right: 100px;
                                                        color: white; /* Icon color */
-                                                       font-size: 24px; /* Icon size */
+                                                       font-size: 32px; /* Icon size */
                                                   "
                                              >
                                                   <i
-                                                       class="fa-solid fa-circle"
+                                                       class="fa-solid fa-circle-check"
                                                        style="color: #22c016"
                                                   ></i>
-                                                  <!-- Checkmark symbol or any other icon -->
-                                             </div>
-                                             <div
-                                                  v-else
-                                                  style="
-                                                       position: absolute;
-                                                       top: 10px;
-                                                       right: 10px;
-                                                       color: white; /* Icon color */
-                                                       font-size: 24px; /* Icon size */
-                                                  "
-                                             >
-                                                  <i
-                                                       class="fa-solid fa-circle"
-                                                       style="color: red"
-                                                  ></i>
+
                                                   <!-- Checkmark symbol or any other icon -->
                                              </div>
                                         </div>
@@ -121,90 +121,91 @@ export default {
                          </div>
                     </div>
                </div>
-
-               <div
-                    v-else
-                    v-for="(option, index2) in question.options"
-                    class="m-5"
-               >
-                    <div style="width: 250px">
-                         <div class="form-check form-block">
-                              <label
-                                   class="form-check-label"
-                                   :for="'example-radio-block' + option.id"
-                              >
-                                   <span
-                                        class="d-block fw-normal text-center my-3"
+              
+                   
+                    <div 
+                           v-else
+                         v-for="(option, index2) in question.options"
+                         class="m-5"
+                    >
+                         <div style="width: 250px">
+                              <div class="form-check form-block">
+                                   <label
+                                        class="form-check-label"
+                                        :for="'example-radio-block' + option.id"
                                    >
-                                        <div
-                                             style="
-                                                  width: 100%;
-                                                  height: 100%;
-                                                  box-shadow: 0px 0px 10px
-                                                       transparent; /* Initial box shadow */
-                                                  transition: background-color
-                                                            0.3s,
-                                                       box-shadow 0.3s; /* Add transitions for smooth change */
-                                                  position: relative; /* To position the icon */
-                                             "
-                                             :style="
-                                                  (option.isChecked && option.isTrue) 
-                                                       ? 'box-shadow: 0px 0px 30px 20px green;'
-                                                       : option.isChecked
-                                                       ? ' box-shadow: 0px 0px 30px 20px red;'
-                                                       : option.isTrue
-                                                       ?'box-shadow: 0px 0px 10px 5px green;'
-                                                       : ''
-
-                                             "
-                                             :class="
-                                                  option.iChecked
-                                                       ? 'checked'
-                                                       : option.isChecked== 1 &&
-                                                         option.isTrue == 0
-                                                       ? 'nonchecked'
-                                                       : ''
-                                             "
+                                        <span
+                                             class="d-block fw-normal text-center my-3"
                                         >
-                                             <!-- Set a fixed height for uniformity -->
-                                             <img
+                                             <div
                                                   style="
                                                        width: 100%;
                                                        height: 100%;
-                                                       object-fit: cover;
-                                                       opacity: 1; /* Set the opacity to 1 (fully opaque) */
+                                                       box-shadow: 0px 0px 10px
+                                                            transparent; /* Initial box shadow */
+                                                       transition: background-color
+                                                                 0.3s,
+                                                            box-shadow 0.3s; /* Add transitions for smooth change */
+                                                       position: relative; /* To position the icon */
                                                   "
-                                                  :src="
-                                                       IMAGES_PATH +
-                                                       option.question_text
+                                                  :style="
+                                                       option.isChecked &&
+                                                       option.isTrue
+                                                            ? 'box-shadow: 0px 0px 2px 2px green;'
+                                                            : option.isChecked
+                                                            ? ' box-shadow: 0px 0px 2px 2px red;'
+                                                            : ''
                                                   "
-                                                  alt="image"
-                                             />
-
-                                             <!-- Add an icon (e.g., a checkmark) -->
-                                             <div
-                                                  v-if="option.isChecked"
-                                                  style="
-                                                       position: absolute;
-                                                       top: 10px;
-                                                       right: 10px;
-                                                       color: white; /* Icon color */
-                                                       font-size: 24px; /* Icon size */
+                                                  :class="
+                                                       option.iChecked
+                                                            ? 'checked'
+                                                            : option.isChecked ==
+                                                                   1 &&
+                                                              option.isTrue == 0
+                                                            ? 'nonchecked'
+                                                            : ''
                                                   "
                                              >
-                                                  <i
-                                                       class="fa-solid fa-circle"
-                                                       style="color: white"
-                                                  ></i>
-                                                  <!-- Checkmark symbol or any other icon -->
+                                                  <!-- Set a fixed height for uniformity -->
+                                                  <img
+                                                       style="
+                                                            width: 100%;
+                                                            height: 100%;
+                                                            object-fit: cover;
+                                                            opacity: 1; /* Set the opacity to 1 (fully opaque) */
+                                                       "
+                                                       :src="
+                                                            IMAGES_PATH +
+                                                            option.question_text
+                                                       "
+                                                       alt="image"
+                                                  />
+
+                                                  <!-- Add an icon (e.g., a checkmark) -->
+                                                  <div
+                                                       v-if="option.isChecked"
+                                                       style="
+                                                            position: absolute;
+                                                            top: -38px;
+                                                            right: 100px;
+                                                            color: white; /* Icon color */
+                                                            font-size: 32px; /* Icon size */
+                                                       "
+                                                  >
+                                                       <i
+                                                            class="fa-solid fa-circle-check"
+                                                            style="color: blue"
+                                                       ></i>
+
+                                                       <!-- Checkmark symbol or any other icon -->
+                                                  </div>
                                              </div>
-                                        </div>
-                                   </span>
-                              </label>
+                                        </span>
+                                   </label>
+                              </div>
                          </div>
                     </div>
-               </div>
-          </div>
+           </div>
      </div>
 
      <div v-else>
@@ -268,11 +269,9 @@ export default {
 </template>
 
 <style>
-
-.checked{
+.checked {
      box-shadow: 0px 0px 5px 6px green;
 }
-
 
 .nonchecked {
      box-shadow: 0px 0px 5px 6px red;

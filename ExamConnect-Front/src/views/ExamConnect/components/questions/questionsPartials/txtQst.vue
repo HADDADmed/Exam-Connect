@@ -97,7 +97,7 @@ export default {
                     </div>
                     
                </div>
-               <div style="display: grid; place-items: center">
+               <div style="display: grid; place-items: center" v-if="question.isTrue == null ">
                          <div v-if="answer.review == 'success'">
                               <i
                                    class="fa fa-check"

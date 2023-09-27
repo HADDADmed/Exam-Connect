@@ -1,5 +1,6 @@
 import axios from "axios";
 import GlobalService from './global.service';
+import router from "@/router"; // Import your Vue Router instance
 const API_URL = GlobalService.getApiUrl() + 'questions/';
 
 class QuestionsService {
@@ -65,7 +66,7 @@ class QuestionsService {
           });
         }
         GlobalService.toasterShowSuccess('Question created successfully !');
-        GlobalService.routerPush("examconnect-questions-list",null,{ filterTearm: questionObj.isQcm })
+        router.push({ name: "examconnect-questions-list", query: { filterTearm: questionObj.isQcm } });
       })
       .catch((error) => {
         console.log(error);

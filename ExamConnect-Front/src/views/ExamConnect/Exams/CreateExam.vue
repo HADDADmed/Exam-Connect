@@ -7,8 +7,6 @@ export default {
           return {
                exam: {
                     examTitle: "",
-                    startTime: "",
-                    endTime: "",
                     duration_minutes: 5,
                     questions: {
                          qcmQuestions: 0,
@@ -139,33 +137,6 @@ export default {
                                    <label for="example-text-input-floating"
                                         >Title</label
                                    >
-                              </div>
-                              <div class="d-flex justify-content-start">
-                                   <div class="mb-4 col-6 mb-4">
-                                        <label
-                                             class="form-label mb-2"
-                                             for="startTime"
-                                             >Start Day Time:</label
-                                        >
-                                        <input
-                                             type="datetime-local"
-                                             class="form-control mb-4 col-6 animated form-control-alt border border-danger bounceInLeft"
-                                             id="startTime"
-                                             v-model="exam.startTime"
-                                        />
-                                   </div>
-                                   <div class="mb-4 col-6 mb-4">
-                                        <label
-                                             class="form-label mb-2"
-                                             for="date_heure_fin"
-                                             >End Day Time :</label
-                                        >
-                                        <input
-                                             type="datetime-local"
-                                             class="form-control mb-4 col-6 form-control-alt border border-danger animated bounceInRight"
-                                             v-model="exam.endTime"
-                                        />
-                                   </div>
                               </div>
                               <div class="d-flex justify-content-center">
                                    <div class="mb-4 col-2 mb-4">
