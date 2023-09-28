@@ -44,7 +44,10 @@ export default {
           },
           generateLink() {
                this.generatedLink =
-                    "http://localhost:5173/#/?exam_id_live=" + this.exam_id;
+                    window.location.origin +
+                    "/#/examconnect/" +
+                    "?exam_id_live=" +
+                     this.exam_id;
           },
      },
      components: {
@@ -64,7 +67,7 @@ export default {
                     <h2 class="fs-base lh-base fw-medium text-muted mb-0">
                          <!-- display the time string version -->
                         this exam duration is {{globalService.minutesToHours( exam.duration_minutes )}}
-                        
+
                     </h2>
                </div>
           </div>

@@ -53,6 +53,7 @@ export default {
                          this.globalService.toasterShowWarning(
                               "Please add at least 2 images"
                          );
+                          return;
                     } else {
                          // check if there is a null image and if  all the images are false using foreach
                          var isNull = false;
@@ -85,6 +86,7 @@ export default {
                          this.globalService.toasterShowWarning(
                               "Please add at least 2 images"
                          );
+                         return;
                     } else {
                          // check if there is a null image and if  all the images are false using foreach
                          var isAllFalse = true;
