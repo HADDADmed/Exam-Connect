@@ -72,13 +72,9 @@ async function onSubmit() {
                               query: { exam_id: exam_id_live },
                          });
                     }
-               } else {
-                    if (response.data.user.isAdmin) {
-                         router.push({ name: "examconnect-dashboard" });
-                    } else {
-                         router.push({ name: "examconnect-dashboard" });
-                    }
-               }
+               } else router.push({ name: "examconnect-dashboard" });
+
+
           },
           (error) => {
                console.log(error);

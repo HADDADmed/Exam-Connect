@@ -6,8 +6,9 @@ const app = express();
 const cors = require("cors"); // Import the cors package
 const allowedOrigins = [
      "http://localhost:3000/",
-     "http://192.168.1.107:5173",
+     "http://192.168.1.106:5173",
      "http://localhost:5173",
+     "http://localhost:5174",
 ];
 const PORT = process.env.SERVER_PORT || 3000;
 
@@ -18,11 +19,7 @@ app.use("/public", express.static("public"));
 app.use(
      cors({
           origin: function (origin, callback) {
-               if (!origin || allowedOrigins.includes(origin)) {
-                    callback(null, true);
-               } else {
-                    callback(new Error("Not allowed by CORS"));
-               }
+                callback(null, true);
           },
      })
 );
