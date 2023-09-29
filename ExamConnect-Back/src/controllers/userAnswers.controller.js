@@ -15,9 +15,7 @@ exports.createUserAnswer = asyncHandler(async (req, res, next) => {
      const exam_id = userAnswer.exam_id;
      const question_id = userAnswer.question_id;
 
-     console.log("userAnswer :");
-     console.log(userAnswer);
-
+     
      let isTrue = null;
      let userAnswerText = null;
      let questionOption_id = null;

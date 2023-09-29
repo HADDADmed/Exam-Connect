@@ -1,331 +1,1774 @@
-<script>
-import ExamsService from "../../services/exams.service";
-import { useTemplateStore } from "@/stores/template";
+<script setup>
+import { onMounted, reactive, ref } from "vue";
 
-export default {
-     data() {
-          return {
-               userExams: [],
-               user: this.globalService.getCurrentUser(),
-               users: [],
-          };
-     },
-     methods: {
-          getAllUserExams() {
-               ExamsService.getAllUserExams().then((response) => {
-                    this.users = response.data;
-                
-               });
+// vue-chartjs, for more info and examples you can check out https://vue-chartjs.org/ and http://www.chartjs.org/docs/ -->
+import { Line, Pie } from "vue-chartjs";
+import { Chart, registerables } from "chart.js";
+import DashboardService from "@/services/dashboard.service.js";
+import UserService from "@/services/users.service.js";
+Chart.register(...registerables);
+// Set Global Chart.js configuration
+Chart.defaults.color = "#818d96";
+Chart.defaults.font.weight = "600";
+Chart.defaults.scale.grid.color = "rgba(0, 0, 0, .05)";
+Chart.defaults.scale.grid.zeroLineColor = "rgba(0, 0, 0, .1)";
+Chart.defaults.scale.beginAtZero = true;
+Chart.defaults.elements.line.borderWidth = 2;
+Chart.defaults.elements.point.radius = 4;
+Chart.defaults.elements.point.hoverRadius = 6;
+Chart.defaults.plugins.tooltip.radius = 3;
+Chart.defaults.plugins.legend.labels.boxWidth = 15;
+
+var chartPolarPieDonutData = ref({
+     labels: ["", "", "",""],
+     datasets: [
+          {
+               data: ["", "", "",""],
+               backgroundColor: ["", "", "",""],
+               hoverBackgroundColor: ["", "", "", ""],
           },
-          getUserExamsById() {
-               ExamsService.getUserExamsById().then((response) => {
-                    this.userExams = response.data;
-                    
-               });
+     ],
+});
+
+var  chartPolarPieDonutDataquestions = ref({
+     labels: ["", "", ""],
+     datasets: [
+          {
+               data: ["", "", ""],
+               backgroundColor: ["", "", ""],
+               hoverBackgroundColor: ["", "", ""],
+          },
+     ],
+});
+
+ 
+// Helper variables
+const orderSearch = ref(false);
+
+// Chart Total Orders data
+const totalFailedExams = reactive({
+     labels: [
+          "MON",
+          "TUE",
+          "WED",
+          "THU",
+          "FRI",
+          "SAT",
+          "SUN",
+          "MON",
+          "TUE",
+          "WED",
+          "THU",
+          "FRI",
+          "SAT",
+          "SUN",
+     ],
+     datasets: [
+          {
+               label: "Total Failed Exams",
+               fill: true,
+               backgroundColor: "rgba(220, 38, 38, .15)",
+               borderColor: "transparent",
+               pointBackgroundColor: "rgba(220, 38, 38, 1)",
+               pointBorderColor: "#fff",
+               pointHoverBackgroundColor: "#fff",
+               pointHoverBorderColor: "rgba(220, 38, 38, 1)",
+               data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          },
+     ],
+});
+
+// Chart Total Orders options
+const totalFailedOptions = reactive({
+     maintainAspectRatio: false,
+     tension: 0.4,
+     scales: {
+          x: {
+               display: false,
+          },
+          y: {
+               display: false,
           },
      },
-     mounted() {
-          if (!this.user.isAdmin) {
-               const store = useTemplateStore();
-               // Set default elements for this layout
-               store.setLayout({
-                    header: true,
-                    sidebar: false,
-                    sideOverlay: false,
-                    footer: true,
-               });
-               // Set various template options for this layout variation
-               store.headerStyle({ mode: "dark" });
-               store.mainContent({ mode: "boxed" });
-               this.getUserExamsById();
-          } else this.getAllUserExams();
+     interaction: {
+          intersect: false,
      },
-};
+     plugins: {
+          legend: {
+               display: false,
+          },
+          tooltip: {
+               callbacks: {
+                    label: function (context) {
+                         return " " + context.parsed.y + " failed exams";
+                    },
+               },
+          },
+     },
+});
+// Chart Total Earnings data
+const totalPassedExamsData = reactive({
+     labels: [
+          "MON",
+          "TUE",
+          "WED",
+          "THU",
+          "FRI",
+          "SAT",
+          "SUN",
+          "MON",
+          "TUE",
+          "WED",
+          "THU",
+          "FRI",
+          "SAT",
+          "SUN",
+     ],
+     datasets: [
+          {
+               label: "Total Passed Exams",
+               fill: true,
+               backgroundColor: "rgba(101, 163, 13, .15)",
+               borderColor: "transparent",
+               pointBackgroundColor: "rgba(101, 163, 13, 1)",
+               pointBorderColor: "#fff",
+               pointHoverBackgroundColor: "#fff",
+               pointHoverBorderColor: "rgba(101, 163, 13, 1)",
+               data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          },
+     ],
+});
+
+// Chart Total Earnings options
+const totalPassedExamsOptions = reactive({
+     maintainAspectRatio: false,
+     tension: 0.4,
+     scales: {
+          x: {
+               display: false,
+          },
+          y: {
+               display: false,
+          },
+     },
+     interaction: {
+          intersect: false,
+     },
+     plugins: {
+          legend: {
+               display: false,
+          },
+          tooltip: {
+               callbacks: {
+                    label: function (context) {
+                         return " " + context.parsed.y;
+                    },
+               },
+          },
+     },
+});
+
+let user_exams = ref([]);
+let examsStatistics = ref({
+     notStarted: 0,
+     inProgress: 0,
+     pendingReview: 0,
+     failed: 0,
+     passed: 0,
+     totalUserExams: 0,
+     totalExams: 0,
+});
+async function getExamsStatistics() {
+     try {
+          DashboardService.getExamsStatistics().then((response) => {
+               user_exams.value = response.data.user_exams;
+               examsStatistics.value.totalUserExams = user_exams.value.length;
+               examsStatistics.value.totalExams =
+                    user_exams.value[0].total_exams;
+               user_exams.value.forEach((row) => {
+                    if (row.user_exam_status === "notStarted") {
+                         examsStatistics.value.notStarted++;
+                    } else if (row.user_exam_status === "inProgress") {
+                         examsStatistics.value.inProgress++;
+                    } else if (row.user_exam_status === "pendingReview") {
+                         examsStatistics.value.pendingReview++;
+                    } else if (row.user_exam_status === "failed") {
+                         examsStatistics.value.failed++;
+                    } else if (row.user_exam_status === "passed") {
+                         examsStatistics.value.passed++;
+                    }
+               });
+
+               chartPolarPieDonutData.value = {
+                    labels: ["NOTSTARTED", "PENDINGREVIEW", "FAILED", "PASSED"],
+                    datasets: [
+                         {
+                              data: [
+                                   examsStatistics.value.notStarted,
+                                   examsStatistics.value.pendingReview,
+                                   examsStatistics.value.failed,
+                                   examsStatistics.value.passed,
+                              ],
+                              backgroundColor: [
+                                   "	rgb(255,215,0,0.75)", // New color for "notStarted"
+                                   "	rgb(30,144,255,0.75)", // New color for "pendingReview"
+                                   "	rgb(255,0,0,0.75)", // New color for "failed"
+                                   "	rgb(0,255,0,0.75)", // New color for "passed"
+                              ],
+                              hoverBackgroundColor: [
+                                   "	rgb(255,215,0,0.75)", // New hover color for "notStarted"
+                                   "	rgb(30,144,255,0.75)", // New hover color for "pendingReview"
+                                   "	rgb(255,0,0,0.75)", // New hover color for "failed"
+                                   "	rgb(0,255,0,0.75)", // New hover color for "passed"
+                              ],
+                         },
+                    ],
+               };
+
+           });
+     } catch (error) {
+          console.log(error);
+     }
+}
+
+
+let questionsStatistics = ref({});
+
+async function getQuestionsStatistics() {
+     try {
+          DashboardService.getQuestionsStatistics().then((response) => {
+               questionsStatistics.value = response.data.questionsStatistics;
+                 chartPolarPieDonutDataquestions.value = {
+                    labels: ["MCQ Questions", "IMAGES Questions", "TEXT Questions"],
+                    datasets: [
+                         {
+                              data: [
+                                   questionsStatistics.value.qcmQuestions,
+                                   questionsStatistics.value.imgQuestions,
+                                   questionsStatistics.value.textQuestions,
+                              ],
+                              backgroundColor: [
+                                   "rgb(255,182,193)", // New color for "notStarted"
+                                   "rgb(0,255,255", // New color for "pendingReview"
+                                   "rgb(169,169,169)", // New color for "failed"
+                              ],
+                              hoverBackgroundColor: [
+                                   "rgb(255,182,193)", // New hover color for "notStarted"
+                                   "rgb(0,255,255", // New hover color for "pendingReview"
+                                   "rgb(169,169,169)", // New hover color for "failed"
+                              ],
+                         },
+                    ],
+               };
+
+           });
+     } catch (error) {
+          console.log(error);
+     }
+}
+
+
+
+let users = ref([]);
+async function getUsers() {
+     try {
+          UserService.getAllUsers().then((response) => {
+               users.value = response.data;
+               console.log(users.value);
+           });
+     } catch (error) {
+          console.log(error);
+     }
+}
+
+onMounted(() => {
+     getExamsStatistics();
+    setTimeout(() => {
+        getQuestionsStatistics();
+        setTimeout(() => {
+            getUsers();
+        }, 1500);
+    }, 1500);
+});
 </script>
 
 <template>
-     <div v-if="user.isAdmin" class="content">
+     <div class="header">
           <!-- Hero -->
-          <div v-if="user.isAdmin" class="content">
+          <div class="content">
                <div
                     class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
                >
                     <div class="flex-grow-1 mb-1 mb-md-0">
-                         <h1 class="h3 fw-bold mb-2">Dashboard</h1>
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
                               Welcome
                               <span style="color: red"
-                                   ><strong>ADMIN</strong></span
+                                   ><strong>ADMIM</strong></span
                               >
-                              to your dashboard
+                              , everything looks great.
                          </h2>
                     </div>
                </div>
           </div>
           <!-- END Hero -->
-          <!-- Full Table -->
-          <BaseBlock title="Users">
-               <template #options>
-                    <button type="button" class="btn-block-option">
-                         <i class="si si-settings"></i>
-                    </button>
-               </template>
-
-               <div class="table-responsive">
-                    <table class="table table-bordered table-vcenter">
-                         <thead>
-                              <tr>
-                                   <th class="text-center" style="width: 100px">
-                                        <i class="far fa-user"></i>
-                                   </th>
-                                   <th style="width: 5%; font-size: 10px">
-                                        user_id,exam_id
-                                   </th>
-                                   <th style="width: 15%">full Name</th>
-                                   <th style="width: 20%">Exam Title</th>
-                                   <th style="width: 25%">Email</th>
-                                   <th style="width: 15%">Status</th>
-                                   <th class="text-center" style="width: 100px">
-                                        Actions
-                                   </th>
-                              </tr>
-                         </thead>
-                         <tbody>
-                              <tr v-for="user in users" :key="user.user_id">
-                                   <td class="text-center">
-                                        <img
-                                             class="img-avatar img-avatar48"
-                                             :src="`/assets/media/avatars/avatar1.jpg`"
-                                             alt="Avatar"
-                                        />
-                                   </td>
-                                   <td class="fw-semibold fs-sm">
-                                        {{ user.user_id }},{{ user.exam_id }}
-                                   </td>
-                                   <td class="fw-semibold fs-sm">
-                                        {{ user.fullName }}
-                                   </td>
-                                   <td class="fw-semibold fs-sm">
-                                        {{ user.ExamTitle }}
-                                   </td>
-                                   <td class="fs-sm">
-                                        <a
-                                             href="javascript:void(1)"
-                                             style="font-size: larger; "
-                                         >
-                                             {{ user.email }}
-                                        </a>
-                                   </td>
-                                   <td
-                                        class="text-center"
-                                        style="margin: 20px 20px 20px 5px"
-                                        :class="
-                                             user.status == 'pendingReview' ||
-                                             user.status == 'notStarted'
-                                                  ? `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning text-light `
-                                                  : user.status ==
-                                                         'inProgress' ||
-                                                    user.status == 'passed'
-                                                  ? `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success  `
-                                                  : `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-danger text-light`
-                                        "
-                                   >
-                                        {{ user.status }}
-                                   </td>
-                                   <td class="text-center">
-                                        <div class="btn-group">
-                                             <button
-                                                  v-if="
-                                                       user.status !==
-                                                            'notStarted' &&
-                                                       user.status !==
-                                                            'inProgress'
-                                                  "
-                                                  type="button"
-                                                  class="btn btn-sm rounded rounded-pill btn-alt-secondary"
-                                                  @click="
-                                                       () => {
-                                                            $router.push({
-                                                                 name: 'examconnect-exam-results',
-                                                                 query: {
-                                                                      exam_id: user.exam_id,
-                                                                      user_id: user.user_id,
-                                                                 },
-                                                            });
-                                                       }
-                                                  "
-                                             >
-                                                  <span
-                                                       v-if="
-                                                            user.status ===
-                                                            'pendingReview'
-                                                       "
-                                                  >
-                                                       Review
-                                                  </span>
-                                                  <span
-                                                       v-else-if="
-                                                            user.status ===
-                                                                 'passed' ||
-                                                            user.status ===
-                                                                 'failed'
-                                                       "
-                                                  >
-                                                       Result
-                                                  </span>
-                                             </button>
-                                        </div>
-                                   </td>
-                              </tr>
-                         </tbody>
-                    </table>
-               </div>
-          </BaseBlock>
-          <!-- END Full Table -->
      </div>
 
-     <div v-if="!user.isAdmin">
+     <div class="header">
+          <!-- Hero -->
           <div class="content">
                <div
                     class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
                >
                     <div class="flex-grow-1 mb-1 mb-md-0">
-                         <h1 class="h3 fw-bold mb-2">Dashboard</h1>
+                         <h1 class="h3 fw-bold mb-2">Exams</h1>
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
-                              Welcome
-                              <span style="color: green"
-                                   ><strong>{{
-                                        userExams.fullName
-                                   }}</strong></span
-                              >
-                              to your dashboard
+                              EXAMS STATISTICS
                          </h2>
+                    </div>
+                    <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
+                        
+                         <div class="dropdown d-inline-block">
+                              <button
+                                   type="button"
+                                   class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview"
+                                   data-bs-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                              >
+                                   <i
+                                        class="fa fa-fw fa-calendar-alt opacity-50"
+                                   ></i>
+                                   <span>All time</span>
+                                   <i class="fa fa-fw fa-angle-down"></i>
+                              </button>
+                              <div
+                                   class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview"
+                              >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 30 days</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last month</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 3 months</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >This year</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last Year</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)"
+                                   >
+                                        <span>All time</span>
+                                        <i class="fa fa-check"></i>
+                                   </a>
+                              </div>
+                         </div>
                     </div>
                </div>
           </div>
-          <div class="content">
-               <!-- Hover Table -->
-               <BaseBlock title="Exams">
-                    <template #options> </template>
+          <!-- END Hero -->
+     </div>
 
-                    <table class="table table-vcenter">
-                         <thead>
-                              <tr>
-                                   <th class="text-center" style="width: 50px">
-                                        #
-                                   </th>
-                                   <th>Exame Title</th>
-                                   <th
-                                        class="d-none d-sm-table-cell"
-                                        style="width: 15%"
+     <!-- Page Content -->
+     <div class="content">
+          <div class="examsStat">
+               <!-- Overview -->
+               <div class="row items-push">
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Pending Orders -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
                                    >
-                                        Status
-                                   </th>
-                                   <th class="text-center" style="width: 100px">
-                                        Actions
-                                   </th>
-                              </tr>
-                         </thead>
-                         <tbody>
-                              <tr v-for="exam in userExams.exams">
-                                   <th class="text-center" scope="row">
-                                        {{ exam.exam_id }}
-                                   </th>
-                                   <td class="fw-semibold fs-sm">
-                                        <a href="javascript:void(0)">{{
-                                             exam.ExamTitle
-                                        }}</a>
-                                   </td>
-                                   <td
-                                        class="text-center"
-                                        style="margin: 20px 20px 20px 5px"
-                                        :class="
-                                             exam.status == 'pendingReview' ||
-                                             exam.status == 'notStarted'
-                                                  ? `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning text-light `
-                                                  : exam.status ==
-                                                         'inProgress' ||
-                                                    exam.status == 'passed'
-                                                  ? `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success  `
-                                                  : `fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-danger text-light`
-                                        "
-                                   >
-                                        {{ exam.status }}
-                                   </td>
-                                   <td class="text-center">
-                                        <div class="btn-group">
-                                             <button
-                                                  v-if="
-                                                       !(
-                                                            exam.status ==
-                                                                 'inProgress' ||
-                                                            exam.status ==
-                                                                 'pendingReview'
-                                                       )
-                                                  "
-                                                  type="button"
-                                                  class="btn btn-sm rounded rounded-pill btn-alt-secondary"
-                                                  @click="
-                                                       () => {
-                                                            if (
-                                                                 exam.status ==
-                                                                      'passed' ||
-                                                                 exam.status ==
-                                                                      'failed'
-                                                            ) {
-                                                                 $router.push({
-                                                                      name: 'examconnect-exam-results',
-                                                                      query: {
-                                                                           exam_id: exam.exam_id,
-                                                                           user_id: userExams.id,
-                                                                      },
-                                                                 });
-                                                            } else
-                                                                 $router.push({
-                                                                      name: 'examconnect-user-exam',
-                                                                      query: {
-                                                                           exam_id: exam.exam_id,
-                                                                           user_id: userExams.id,
-                                                                      },
-                                                                 });
-                                                       }
-                                                  "
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{ examsStatistics.notStarted }}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
                                              >
-                                                  <span
-                                                       v-if="
-                                                            exam.status ===
-                                                                 'passed' ||
-                                                            exam.status ===
-                                                                 'failed'
-                                                       "
-                                                  >
-                                                       Result
-                                                  </span>
-
-                                                  <span
-                                                       v-if="
-                                                            exam.status ==
-                                                            'notStarted'
-                                                       "
-                                                  >
-                                                       Start
-                                                  </span>
-                                             </button>
+                                                  User Exam Not Started
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-hourglass-start"
+                                             ></i>
                                         </div>
-                                   </td>
-                              </tr>
-                         </tbody>
-                    </table>
-               </BaseBlock>
-               <!-- END Hover Table -->
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span
+                                                  >View all the Not Started User
+                                                  Exams
+                                             </span>
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Pending Orders -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- New Customers -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{ examsStatistics.pendingReview }}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  User Exam Pending your Review
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-hourglass-end"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span
+                                                  >View all Pending Review User
+                                                  Exams</span
+                                             >
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END New Customers -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Messages -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{ examsStatistics.totalExams }}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  User Exam In Total
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-chalkboard-user"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span>View all User Exams</span>
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Messages -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Conversion Rate -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{ examsStatistics.totalUserExams }}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  Exam in Total
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-chalkboard"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span>View All Exams</span>
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Conversion Rate-->
+                    </div>
+               </div>
+               <!-- END Overview -->
+
+               <!-- Statistics -->
+               <div class="row">
+                    <div class="col-xl-8 col-xxl-9 d-flex flex-column">
+                         <!-- Earnings Summary -->
+                         <BaseBlock class="flex-grow-1 d-flex flex-column">
+                              <template #options>
+                                   <button
+                                        type="button"
+                                        class="btn-block-option"
+                                   >
+                                        <i class="si si-settings"></i>
+                                   </button>
+                              </template>
+
+                              <template #content>
+                                   <!-- Pie Chart -->
+                                   <BaseBlock
+                                        content-full
+                                        content-class="text-center"
+                                   >
+                                        <div class="py-3 px-xxl-7">
+                                             <Pie
+                                                  :data="chartPolarPieDonutData"
+                                                  :options="{
+                                                       maintainAspectRatio: false,
+                                                  }"
+                                                  style="height: 350px"
+                                             />
+                                        </div>
+                                   </BaseBlock>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Earnings Summary -->
+                    </div>
+                    <div class="col-xl-4 col-xxl-3 d-flex flex-column">
+                         <!-- Last 2 Weeks -->
+                         <div class="row items-push flex-grow-1">
+                              <div class="col-md-6 col-xl-12">
+                                   <BaseBlock
+                                        class="d-flex flex-column h-100 mb-0"
+                                   >
+                                        <template #content>
+                                             <div
+                                                  class="block-content flex-grow-1 d-flex justify-content-between"
+                                             >
+                                                  <dl class="mb-0">
+                                                       <dt class="fs-3 fw-bold">
+                                                            {{ examsStatistics.failed }}
+                                                            <i
+                                                                 class="fa-solid fa-circle-xmark"
+                                                                 style="
+                                                                      color: #ff0000;
+                                                                 "
+                                                            ></i>
+                                                       </dt>
+                                                       <dd
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Total Failed Exams
+                                                       </dd>
+                                                  </dl>
+                                                  <div></div>
+                                             </div>
+                                             <div
+                                                  class="block-content p-1 text-center overflow-hidden"
+                                             >
+                                                  <Line
+                                                       :data="totalFailedExams"
+                                                       :options="
+                                                            totalFailedOptions
+                                                       "
+                                                       style="height: 90px"
+                                                  />
+                                             </div>
+
+                                             <div
+                                                  class="bg-body-light rounded-bottom"
+                                             >
+                                                  <a
+                                                       class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                                       href="javascript:void(0)"
+                                                  >
+                                                       <span
+                                                            >View all The Failed
+                                                            Exams
+                                                       </span>
+                                                       <i
+                                                            class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                                       ></i>
+                                                  </a>
+                                             </div>
+                                        </template>
+                                   </BaseBlock>
+                              </div>
+                              <div class="col-md-6 col-xl-12">
+                                   <BaseBlock
+                                        class="d-flex flex-column h-100 mb-0"
+                                   >
+                                        <template #content>
+                                             <div
+                                                  class="block-content flex-grow-1 d-flex justify-content-between"
+                                             >
+                                                  <dl class="mb-0">
+                                                       <dt class="fs-3 fw-bold">
+                                                            {{ examsStatistics.passed }}
+                                                            <i
+                                                                 class="fa-solid fa-circle-check"
+                                                                 style="
+                                                                      color: #59ff00;
+                                                                 "
+                                                            ></i>
+                                                       </dt>
+                                                       <dd
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Total Passed Exams
+                                                       </dd>
+                                                  </dl>
+                                                  <div></div>
+                                             </div>
+                                             <div
+                                                  class="block-content p-1 text-center overflow-hidden"
+                                             >
+                                                  <Line
+                                                       :data="
+                                                            totalPassedExamsData
+                                                       "
+                                                       :options="
+                                                            totalPassedExamsOptions
+                                                       "
+                                                       style="height: 90px"
+                                                  />
+                                             </div>
+                                             <div
+                                                  class="bg-body-light rounded-bottom"
+                                             >
+                                                  <a
+                                                       class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                                       href="javascript:void(0)"
+                                                  >
+                                                       <span
+                                                            >View all the Passed
+                                                            Exams
+                                                       </span>
+                                                       <i
+                                                            class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                                       ></i>
+                                                  </a>
+                                             </div>
+                                        </template>
+                                   </BaseBlock>
+                              </div>
+                         </div>
+                         <!-- END Last 2 Weeks -->
+                    </div>
+               </div>
+               <!-- END Statistics -->
           </div>
      </div>
-</template>
 
-<style>
-.fixed-size-image {
-     width: 200px;
-     height: 150px;
-     object-fit: cover;
-}
-</style>
+     <div class="header">
+          <!-- Hero -->
+          <div class="content">
+               <div
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
+               >
+                    <div class="flex-grow-1 mb-1 mb-md-0">
+                         <h1 class="h3 fw-bold mb-2">Questions</h1>
+                         <h2 class="h6 fw-medium fw-medium text-muted mb-0">
+                              QUESTIONS STATISTICS
+                         </h2>
+                    </div>
+                    <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
+                         
+                         <div class="dropdown d-inline-block">
+                              <button
+                                   type="button"
+                                   class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview"
+                                   data-bs-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                              >
+                                   <i
+                                        class="fa fa-fw fa-calendar-alt opacity-50"
+                                   ></i>
+                                   <span>All time</span>
+                                   <i class="fa fa-fw fa-angle-down"></i>
+                              </button>
+                              <div
+                                   class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview"
+                              >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 30 days</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last month</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 3 months</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >This year</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last Year</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)"
+                                   >
+                                        <span>All time</span>
+                                        <i class="fa fa-check"></i>
+                                   </a>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+          <!-- END Hero -->
+     </div>
+
+     <div class="content">
+          <div class="questionsStat">
+               <!-- TEST -->
+               <!-- Overview -->
+               <div class="row items-push">
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Pending Orders -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{questionsStatistics.qcmQuestions}}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  MCQ (QCM) Questions
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-circle-question"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span
+                                                  >View all MCQ (QCM)
+                                                  Questions</span
+                                             >
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Pending Orders -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- New Customers -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{questionsStatistics.textQuestions}}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  Text Questions
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i class="fa-solid fa-pencil"></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span
+                                                  >View all the Text Questions
+                                             </span>
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END New Customers -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Messages -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{questionsStatistics.imgQuestions}}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  Image Questions
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa-solid fa-circle-question"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span
+                                                  >View all Images
+                                                  Questions</span
+                                             >
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Messages -->
+                    </div>
+                    <div class="col-sm-6 col-xxl-3">
+                         <!-- Conversion Rate -->
+                         <BaseBlock class="d-flex flex-column h-100 mb-0">
+                              <template #content>
+                                   <div
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
+                                   >
+                                        <dl class="mb-0">
+                                             <dt class="fs-3 fw-bold">{{ questionsStatistics.total_questions }}</dt>
+                                             <dd
+                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
+                                             >
+                                                  Questions in Total
+                                             </dd>
+                                        </dl>
+                                        <div
+                                             class="item item-rounded-lg bg-body-light"
+                                        >
+                                             <i
+                                                  class="fa fa-chart-bar fs-3 text-primary"
+                                             ></i>
+                                        </div>
+                                   </div>
+                                   <div class="bg-body-light rounded-bottom">
+                                        <a
+                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             <span>View statistics</span>
+                                             <i
+                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
+                                             ></i>
+                                        </a>
+                                   </div>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Conversion Rate-->
+                    </div>
+               </div>
+               <!-- END Overview -->
+
+               <!-- Statistics -->
+               <div class="row">
+                    <!-- <div :class="whoseAuthenticated=='USER'?'d-flex justify-content-center align-item-center':'col-xl-8 col-xxl-9 d-flex flex-column'"> -->
+
+                    <div class="col-xl-12 col-xxl-12 d-flex flex-column">
+                         <!-- Earnings Summary -->
+                         <BaseBlock class="flex-grow-1 d-flex flex-column">
+                              <template #options>
+                                   <button
+                                        type="button"
+                                        class="btn-block-option"
+                                   >
+                                        <i class="si si-settings"></i>
+                                   </button>
+                              </template>
+
+                              <template #content>
+                                   <BaseBlock
+                                        content-full
+                                        content-class="text-center"
+                                   >
+                                        <div class="py-3 px-xxl-7">
+                                             <Pie
+                                                  :data="
+                                                       chartPolarPieDonutDataquestions
+                                                  "
+                                                  :options="{
+                                                       maintainAspectRatio: false,
+                                                  }"
+                                                  style="height: 350px"
+                                             />
+                                        </div>
+                                   </BaseBlock>
+                              </template>
+                         </BaseBlock>
+                         <!-- END Earnings Summary -->
+                    </div>
+               </div>
+               <!-- END Statistics -->
+
+               <!-- ENDTEST  -->
+          </div>
+     </div>
+     <div class="header">
+          <!-- Hero -->
+          <div class="content">
+               <div
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
+               >
+                    <div class="flex-grow-1 mb-1 mb-md-0">
+                         <h1 class="h3 fw-bold mb-2">Users</h1>
+                         <h2 class="h6 fw-medium fw-medium text-muted mb-0">
+                              USERS OVERVIEW
+                         </h2>
+                    </div>
+                    <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
+                         <a
+                              href="javascript:void(0)"
+                              class="btn btn-sm btn-alt-secondary space-x-1"
+                         >
+                              <i class="fa fa-cogs opacity-50"></i>
+                              <span>Settings</span>
+                         </a>
+                         <div class="dropdown d-inline-block">
+                              <button
+                                   type="button"
+                                   class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview"
+                                   data-bs-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"
+                              >
+                                   <i
+                                        class="fa fa-fw fa-calendar-alt opacity-50"
+                                   ></i>
+                                   <span>All time</span>
+                                   <i class="fa fa-fw fa-angle-down"></i>
+                              </button>
+                              <div
+                                   class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview"
+                              >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 30 days</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last month</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last 3 months</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >This year</a
+                                   >
+                                   <a
+                                        class="dropdown-item fw-medium"
+                                        href="javascript:void(0)"
+                                        >Last Year</a
+                                   >
+                                   <div class="dropdown-divider"></div>
+                                   <a
+                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)"
+                                   >
+                                        <span>All time</span>
+                                        <i class="fa fa-check"></i>
+                                   </a>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+          <!-- END Hero -->
+     </div>
+
+     <div class="content">
+          <div class="users">
+               <!-- Recent Orders -->
+               <BaseBlock title="Recent Orders">
+                    <template #options>
+                         <div class="space-x-1">
+                              <button
+                                   type="button"
+                                   class="btn btn-sm btn-alt-secondary"
+                                   @click="
+                                        () => {
+                                             orderSearch = !orderSearch;
+                                        }
+                                   "
+                              >
+                                   <i class="fa fa-search"></i>
+                              </button>
+                              <div class="dropdown d-inline-block">
+                                   <button
+                                        type="button"
+                                        class="btn btn-sm btn-alt-secondary"
+                                        id="dropdown-recent-orders-filters"
+                                        data-bs-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                   >
+                                        <i class="fa fa-fw fa-flask"></i>
+                                        Filters
+                                        <i class="fa fa-angle-down ms-1"></i>
+                                   </button>
+                                   <div
+                                        class="dropdown-menu dropdown-menu-md dropdown-menu-end fs-sm"
+                                        aria-labelledby="dropdown-recent-orders-filters"
+                                   >
+                                        <a
+                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             Pending
+                                             <span
+                                                  class="badge bg-primary rounded-pill"
+                                                  >20</span
+                                             >
+                                        </a>
+                                        <a
+                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             Active
+                                             <span
+                                                  class="badge bg-primary rounded-pill"
+                                                  >72</span
+                                             >
+                                        </a>
+                                        <a
+                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             Completed
+                                             <span
+                                                  class="badge bg-primary rounded-pill"
+                                                  >890</span
+                                             >
+                                        </a>
+                                        <a
+                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)"
+                                        >
+                                             All
+                                             <span
+                                                  class="badge bg-primary rounded-pill"
+                                                  >997</span
+                                             >
+                                        </a>
+                                   </div>
+                              </div>
+                         </div>
+                    </template>
+
+                    <template #content>
+                         <div
+                              v-if="orderSearch"
+                              id="one-dashboard-search-orders"
+                              class="block-content border-bottom"
+                         >
+                              <!-- Search Form -->
+                              <form @submit.prevent>
+                                   <div class="push">
+                                        <div class="input-group">
+                                             <input
+                                                  type="text"
+                                                  class="form-control form-control-alt"
+                                                  id="one-ecom-orders-search"
+                                                  name="one-ecom-orders-search"
+                                                  placeholder="Search all orders.."
+                                             />
+                                             <span
+                                                  class="input-group-text bg-body border-0"
+                                             >
+                                                  <i class="fa fa-search"></i>
+                                             </span>
+                                        </div>
+                                   </div>
+                              </form>
+                              <!-- END Search Form -->
+                         </div>
+                         <div class="block-content block-content-full">
+                              <!-- Recent Orders Table -->
+                              <div class="table-responsive">
+                                   <table
+                                        class="table table-hover table-vcenter"
+                                   >
+                                        <thead>
+                                             <tr>
+                                                  <th>Order ID</th>
+                                                  <th
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       Customer
+                                                  </th>
+                                                  <th>Status</th>
+                                                  <th
+                                                       class="d-none d-sm-table-cell text-center"
+                                                  >
+                                                       Profit
+                                                  </th>
+                                                  <th
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       Created
+                                                  </th>
+                                                  <th
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       Value
+                                                  </th>
+                                             </tr>
+                                        </thead>
+                                        <tbody class="fs-sm">
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00925
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Marie Duncan</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Photographer
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
+                                                            >Completed</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 8%;
+                                                                 "
+                                                                 aria-valuenow="8"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            8%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       7 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$786,81</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00924
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Jack Estrada</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Photographer
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-info-light text-info"
+                                                            >Active</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 6%;
+                                                                 "
+                                                                 aria-valuenow="6"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            6%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       26 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$1184,20</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00923
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Megan Fuller</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Web developer
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
+                                                            >Completed</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 25%;
+                                                                 "
+                                                                 aria-valuenow="25"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            25%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       19 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$2379,44</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00922
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Lisa Jenkins</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Application Manager
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning-light text-warning"
+                                                            >Pending</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 18%;
+                                                                 "
+                                                                 aria-valuenow="18"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            18%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       13 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$458,52</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00921
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Brian Stevens</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Photographer
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
+                                                            >Completed</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 10%;
+                                                                 "
+                                                                 aria-valuenow="10"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            10%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       4 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$476,82</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00920
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Jesse Fisher</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Digital Nomad
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning-light text-warning"
+                                                            >Pending</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 23%;
+                                                                 "
+                                                                 aria-valuenow="23"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            23%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       23 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$1939,58</strong>
+                                                  </td>
+                                             </tr>
+                                             <tr>
+                                                  <td>
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                       >
+                                                            ORD.00919
+                                                       </a>
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Premium
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-xl-table-cell"
+                                                  >
+                                                       <a
+                                                            class="fw-semibold"
+                                                            href="javascript:void(0)"
+                                                            >Carol Ray</a
+                                                       >
+                                                       <p
+                                                            class="fs-sm fw-medium text-muted mb-0"
+                                                       >
+                                                            Web developer
+                                                       </p>
+                                                  </td>
+                                                  <td>
+                                                       <span
+                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-info-light text-info"
+                                                            >Active</span
+                                                       >
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell"
+                                                  >
+                                                       <div
+                                                            class="progress mb-1"
+                                                            style="height: 5px"
+                                                       >
+                                                            <div
+                                                                 class="progress-bar bg-success"
+                                                                 role="progressbar"
+                                                                 style="
+                                                                      width: 14%;
+                                                                 "
+                                                                 aria-valuenow="14"
+                                                                 aria-valuemin="0"
+                                                                 aria-valuemax="100"
+                                                            ></div>
+                                                       </div>
+                                                       <p
+                                                            class="fs-xs fw-semibold mb-0"
+                                                       >
+                                                            14%
+                                                       </p>
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
+                                                  >
+                                                       15 min ago
+                                                  </td>
+                                                  <td
+                                                       class="d-none d-sm-table-cell text-end"
+                                                  >
+                                                       <strong>$2200,10</strong>
+                                                  </td>
+                                             </tr>
+                                        </tbody>
+                                   </table>
+                              </div>
+                              <!-- END Recent Orders Table -->
+                         </div>
+                         <div
+                              class="block-content block-content-full bg-body-light"
+                         >
+                              <!-- Pagination -->
+                              <nav aria-label="Photos Search Navigation">
+                                   <ul
+                                        class="pagination pagination-sm justify-content-end mb-0"
+                                   >
+                                        <li class="page-item">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  tabindex="-1"
+                                                  aria-label="Previous"
+                                             >
+                                                  Prev
+                                             </a>
+                                        </li>
+                                        <li class="page-item active">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  >1</a
+                                             >
+                                        </li>
+                                        <li class="page-item">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  >2</a
+                                             >
+                                        </li>
+                                        <li class="page-item">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  >3</a
+                                             >
+                                        </li>
+                                        <li class="page-item">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  >4</a
+                                             >
+                                        </li>
+                                        <li class="page-item">
+                                             <a
+                                                  class="page-link"
+                                                  href="javascript:void(0)"
+                                                  aria-label="Next"
+                                             >
+                                                  Next
+                                             </a>
+                                        </li>
+                                   </ul>
+                              </nav>
+                              <!-- END Pagination -->
+                         </div>
+                    </template>
+               </BaseBlock>
+               <!-- END Recent Orders -->
+          </div>
+     </div>
+     <!-- END Page Content -->
+</template>

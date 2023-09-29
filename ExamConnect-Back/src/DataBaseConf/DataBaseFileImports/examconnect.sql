@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 25 sep. 2023 à 19:46
+-- Généré le : mer. 27 sep. 2023 à 19:48
 -- Version du serveur : 10.4.28-MariaDB
 -- Version de PHP : 8.2.4
 
@@ -31,8 +31,6 @@ CREATE TABLE `exam` (
   `id` int(11) NOT NULL,
   `ExamTitle` varchar(255) DEFAULT NULL,
   `questionsCount` int(11) DEFAULT NULL,
-  `startTime` varchar(255) DEFAULT NULL,
-  `endTime` varchar(255) DEFAULT NULL,
   `duration_minutes` int(11) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -41,8 +39,14 @@ CREATE TABLE `exam` (
 -- Déchargement des données de la table `exam`
 --
 
-INSERT INTO `exam` (`id`, `ExamTitle`, `questionsCount`, `startTime`, `endTime`, `duration_minutes`, `createdAt`) VALUES
-(31, 'Last test Exam ', 6, '2023-09-08T18:16', '2023-09-15T18:16', 10, '2023-09-25 18:17:05');
+INSERT INTO `exam` (`id`, `ExamTitle`, `questionsCount`, `duration_minutes`, `createdAt`) VALUES
+(54, 'dscadsac', 6, 5, '2023-09-27 10:08:37'),
+(55, 'dsaf', 7, 5, '2023-09-27 10:30:34'),
+(56, 'sadfdsf', 7, 5, '2023-09-27 10:45:45'),
+(57, 'Test exam ', 16, 60, '2023-09-27 10:57:38'),
+(58, 'HELLLL ADMIN TEST ', 6, 8, '2023-09-27 12:50:56'),
+(59, 'dfdsaf', 2, 129, '2023-09-27 12:55:55'),
+(60, 'HELLLL ADMIN TEST ghgfdhgdfhfd', 6, 5, '2023-09-27 17:39:08');
 
 -- --------------------------------------------------------
 
@@ -61,12 +65,54 @@ CREATE TABLE `exam_question` (
 --
 
 INSERT INTO `exam_question` (`id`, `question_id`, `exam_id`) VALUES
-(296, 14, 31),
-(297, 17, 31),
-(298, 39, 31),
-(299, 41, 31),
-(300, 47, 31),
-(301, 51, 31);
+(406, 27, 54),
+(407, 31, 54),
+(408, 55, 54),
+(409, 50, 54),
+(410, 51, 54),
+(411, 78, 54),
+(412, 7, 55),
+(413, 33, 55),
+(414, 32, 55),
+(415, 43, 55),
+(416, 40, 55),
+(418, 49, 55),
+(419, 8, 56),
+(420, 45, 56),
+(421, 34, 56),
+(422, 33, 56),
+(423, 32, 56),
+(425, 52, 56),
+(426, 16, 57),
+(427, 56, 57),
+(428, 28, 57),
+(429, 3, 57),
+(430, 58, 57),
+(431, 9, 57),
+(432, 31, 57),
+(433, 45, 57),
+(434, 42, 57),
+(435, 36, 57),
+(436, 39, 57),
+(437, 78, 57),
+(438, 52, 57),
+(439, 46, 57),
+(440, 80, 57),
+(441, 48, 57),
+(442, 15, 58),
+(443, 10, 58),
+(444, 25, 58),
+(445, 39, 58),
+(446, 35, 58),
+(447, 47, 58),
+(448, 25, 59),
+(449, 40, 59),
+(450, 13, 60),
+(451, 59, 60),
+(452, 33, 60),
+(453, 45, 60),
+(454, 46, 60),
+(455, 78, 60);
 
 -- --------------------------------------------------------
 
@@ -110,9 +156,14 @@ CREATE TABLE `exam_user` (
 --
 
 INSERT INTO `exam_user` (`id`, `exam_id`, `user_id`, `createdAt`, `status`) VALUES
-(17, 31, 31, '2023-09-25 18:17:05', 'notStarted'),
-(18, 31, 30, '2023-09-25 18:17:05', 'failed'),
-(19, 31, 27, '2023-09-25 18:17:05', 'failed');
+(52, 54, 27, '2023-09-27 10:08:37', 'passed'),
+(53, 55, 27, '2023-09-27 10:30:34', 'passed'),
+(54, 56, 27, '2023-09-27 10:45:45', 'pendingReview'),
+(55, 57, 27, '2023-09-27 10:57:38', 'passed'),
+(56, 58, 27, '2023-09-27 12:50:56', 'pendingReview'),
+(57, 59, 27, '2023-09-27 12:55:56', 'passed'),
+(58, 60, 27, '2023-09-27 17:39:08', 'passed'),
+(59, 60, 28, '2023-09-27 17:39:08', 'notStarted');
 
 -- --------------------------------------------------------
 
@@ -132,15 +183,33 @@ CREATE TABLE `exam_user_status` (
 --
 
 INSERT INTO `exam_user_status` (`id`, `status_id`, `exam_user_id`, `createdAt`) VALUES
-(63, 1, 17, '2023-09-25 18:17:05'),
-(64, 1, 18, '2023-09-25 18:17:05'),
-(65, 1, 19, '2023-09-25 18:17:05'),
-(66, 2, 19, '2023-09-25 18:17:45'),
-(67, 3, 19, '2023-09-25 18:18:05'),
-(68, 4, 19, '2023-09-25 18:19:10'),
-(69, 2, 18, '2023-09-25 18:22:37'),
-(70, 3, 18, '2023-09-25 18:23:50'),
-(71, 4, 18, '2023-09-25 18:26:22');
+(156, 1, 52, '2023-09-27 10:08:37'),
+(157, 2, 52, '2023-09-27 10:08:47'),
+(158, 3, 52, '2023-09-27 10:09:05'),
+(159, 1, 53, '2023-09-27 10:30:34'),
+(160, 2, 53, '2023-09-27 10:30:44'),
+(161, 3, 53, '2023-09-27 10:30:56'),
+(162, 5, 53, '2023-09-27 10:42:20'),
+(163, 1, 54, '2023-09-27 10:45:45'),
+(164, 2, 54, '2023-09-27 10:45:53'),
+(165, 3, 54, '2023-09-27 10:46:03'),
+(166, 1, 55, '2023-09-27 10:57:38'),
+(167, 2, 55, '2023-09-27 10:57:53'),
+(168, 3, 55, '2023-09-27 10:58:17'),
+(169, 5, 55, '2023-09-27 10:59:08'),
+(170, 1, 56, '2023-09-27 12:50:56'),
+(171, 1, 57, '2023-09-27 12:55:56'),
+(172, 5, 52, '2023-09-27 13:01:41'),
+(173, 1, 58, '2023-09-27 17:39:08'),
+(174, 1, 59, '2023-09-27 17:39:08'),
+(175, 2, 58, '2023-09-27 17:40:01'),
+(176, 3, 58, '2023-09-27 17:40:21'),
+(177, 5, 58, '2023-09-27 18:39:07'),
+(178, 2, 56, '2023-09-27 18:43:39'),
+(179, 3, 56, '2023-09-27 18:43:49'),
+(180, 2, 57, '2023-09-27 18:44:53'),
+(181, 3, 57, '2023-09-27 18:44:58'),
+(182, 5, 57, '2023-09-27 18:45:13');
 
 -- --------------------------------------------------------
 
@@ -183,7 +252,6 @@ INSERT INTO `question` (`id`, `question_text`, `isQCM`, `createdAt`) VALUES
 (26, '<p><strong>What is the role of a web server in server-side web development?</strong></p>', 1, '2023-09-18 18:50:00'),
 (27, '<h2><strong>Which programming language is commonly used for building responsive web applications?</strong></h2>', 1, '2023-09-18 19:00:00'),
 (28, '<p><strong>What does the \"href\" attribute define in an HTML <a> tag?</strong></p>', 1, '2023-09-18 19:10:00'),
-(29, '<h2><strong>What is the purpose of the \"DOCTYPE\" declaration in HTML documents?</strong></h2>', 1, '2023-09-18 19:20:00'),
 (31, '<h2><strong>Calculate the Area of a Circle</strong></h2><p>Write a function that calculates the area of a circle given its radius.</p><h4><strong>Instructions :</strong></h4><ul><li>Use the formula: Area = π * (radius * radius)</li><li>Return the calculated area.</li></ul>', 0, '2023-09-18 20:00:00'),
 (32, '<h2><strong>Find the Sum of Even Numbers</strong></h2><p>Write a function that finds the sum of all even numbers in an array.</p><h4><strong>Instructions :</strong></h4><ul><li>Iterate through the array and add even numbers to the sum.</li><li>Return the total sum.</li></ul>', 0, '2023-09-18 20:10:00'),
 (33, '<h2><strong>Reverse a String</strong></h2><p>Write a function that reverses a given string.</p><h4><strong>Instructions :</strong></h4><ul><li>Iterate through the string and build a reversed version of it.</li><li>Return the reversed string.</li></ul>', 0, '2023-09-18 20:20:00'),
@@ -211,7 +279,10 @@ INSERT INTO `question` (`id`, `question_text`, `isQCM`, `createdAt`) VALUES
 (57, '<h3><strong>Which HTML tag is used for creating a form in web development?</strong></h3>', 1, '2023-09-19 18:41:55'),
 (58, '<h3><strong>Which HTML tag is used for creating a table in a web page?</strong></h3><p><br>&nbsp;</p>', 1, '2023-09-19 18:43:15'),
 (59, '<h3>Which HTML tag is used to create an unordered list?</h3>', 1, '2023-09-19 18:44:11'),
-(60, '<h3>What is the correct HTML element for inserting a line break?</h3>', 1, '2023-09-19 18:45:20');
+(60, '<h3>What is the correct HTML element for inserting a line break?</h3>', 1, '2023-09-19 18:45:20'),
+(78, '<p>TEST qst&nbsp;</p>', 2, '2023-09-26 16:55:53'),
+(80, '<p>cdsgvdfg</p>', 2, '2023-09-26 17:41:07'),
+(81, '<p>cgfcgxbc</p>', 2, '2023-09-26 18:00:02');
 
 -- --------------------------------------------------------
 
@@ -344,10 +415,6 @@ INSERT INTO `questionoption` (`id`, `question_id`, `question_text`, `isTrue`) VA
 (137, 28, 'It specifies the link type.', 0),
 (138, 28, 'It sets the link `s text color.', 0),
 (139, 28, 'It defines the link`s position on the page.', 0),
-(140, 29, 'To specify the document type and version.', 1),
-(141, 29, 'To define the background color of the page.', 0),
-(142, 29, 'To set the font size for the entire document.', 0),
-(143, 29, 'To control the layout of the webpage.', 0),
 (148, 51, 'qst_option__18-8-2023_12-23-44__924770461.jpg', 1),
 (149, 51, 'qst_option__19-8-2023_12-5-46__17307198.jpg', 0),
 (150, 56, '<p>&lt;a&gt;</p>', 1),
@@ -369,7 +436,14 @@ INSERT INTO `questionoption` (`id`, `question_id`, `question_text`, `isTrue`) VA
 (166, 60, '<p>&lt;linebreak&gt;</p>', 0),
 (167, 60, '<p>&lt;lb&gt;</p>', 0),
 (168, 60, '<p>&lt;br&gt;</p>', 1),
-(169, 60, '<p>&lt;newline&gt;</p>', 0);
+(169, 60, '<p>&lt;newline&gt;</p>', 0),
+(199, 78, '798341197-26-8-2023.png', 1),
+(200, 78, '146244794-26-8-2023.jpg', 0),
+(204, 80, '548879957-26-8-2023.jpg', 0),
+(205, 80, '182096602-26-8-2023.jpg', 0),
+(206, 80, '656894689-26-8-2023.jpg', 1),
+(207, 81, '365857989-26-8-2023.jpg', 0),
+(208, 81, '708388353-26-8-2023.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -405,7 +479,8 @@ INSERT INTO `user` (`id`, `fullName`, `email`, `password`, `isAdmin`) VALUES
 (38, 'Mia White', 'miawhite@yahoo.com', '123', 0),
 (39, 'Ethan Taylor', 'ethtaylor@gmail.com', '123', 0),
 (40, 'Emma Lewis', 'emmalewis@gmail.com', '123', 0),
-(41, 'Noah Clark', 'noahclark@yahoo.com', '123', 0);
+(41, 'Noah Clark', 'noahclark@yahoo.com', '123', 0),
+(42, 'Hamza Demnani', 'demnani@gmail.com', '12345678qQ', 0);
 
 -- --------------------------------------------------------
 
@@ -428,18 +503,54 @@ CREATE TABLE `useranswer` (
 --
 
 INSERT INTO `useranswer` (`id`, `user_id`, `exam_id`, `question_id`, `questionOption_id`, `isTrue`, `userAnswerText`) VALUES
-(128, 27, 31, 41, NULL, 1, 'http://localhost:5173/#/?exam_id_live=31'),
-(129, 27, 31, 39, NULL, 0, 'http://localhost:5173/#/?exam_id_live=31'),
-(130, 27, 31, 14, 81, 0, NULL),
-(131, 27, 31, 17, 94, 0, NULL),
-(132, 27, 31, 51, 148, 1, NULL),
-(133, 27, 31, 47, 5, 0, NULL),
-(134, 30, 31, 39, NULL, 1, 'emilydavis@hotmail.comemilydavis@hotmail.com'),
-(135, 30, 31, 41, NULL, 0, 'emilydavis@hotmail.comemilydavis@hotmail.comemilydavis@hotmail.com'),
-(136, 30, 31, 14, 81, 0, NULL),
-(137, 30, 31, 17, 93, 0, NULL),
-(138, 30, 31, 47, 4, 1, NULL),
-(139, 30, 31, 51, 149, 0, NULL);
+(234, 27, 54, 31, NULL, 1, 'http://localhost:5173/#/?exam_id_live=54http://localhost:5173/#/?exam_id_live=54'),
+(235, 27, 54, 27, 132, 1, NULL),
+(236, 27, 54, 55, 25, 1, NULL),
+(237, 27, 54, 50, 14, 0, NULL),
+(238, 27, 54, 51, 149, 0, NULL),
+(239, 27, 54, 78, 199, 1, NULL),
+(240, 27, 55, 33, NULL, 0, 'http://localhost:5173/#/?exam_id_live=55http://localhost:5173/#/?exam_id_live=55'),
+(241, 27, 55, 32, NULL, 0, 'http://localhost:5173/#/?exam_id_live=55'),
+(242, 27, 55, 43, NULL, 0, 'http://localhost:5173/#/?exam_id_live=55http://localhost:5173/#/?exam_id_live=55'),
+(243, 27, 55, 40, NULL, 1, 'http://localhost:5173/#/?exam_id_live=55http://localhost:5173/#/?exam_id_live=55'),
+(244, 27, 55, 7, 52, 1, NULL),
+(245, 27, 55, 49, 10, 1, NULL),
+(247, 27, 56, 34, NULL, 0, 'http://localhost:5173/#/?exam_id_live=56'),
+(248, 27, 56, 33, NULL, NULL, 'http://localhost:5173/#/?exam_id_live=56'),
+(249, 27, 56, 45, NULL, 1, 'http://localhost:5173/#/?exam_id_live=56'),
+(250, 27, 56, 32, NULL, NULL, 'http://localhost:5173/#/?exam_id_live=56'),
+(251, 27, 56, 8, 56, 0, NULL),
+(252, 27, 56, 52, 17, 0, NULL),
+(254, 27, 57, 39, NULL, 1, 'http://localhost:5173/#/?exam_id_live=57'),
+(255, 27, 57, 16, 88, 1, NULL),
+(256, 27, 57, 78, 199, 1, NULL),
+(257, 27, 57, 52, 17, 0, NULL),
+(258, 27, 57, 46, 1, 1, NULL),
+(259, 27, 57, 56, 152, 0, NULL),
+(260, 27, 57, 80, 205, 0, NULL),
+(261, 27, 57, 48, 7, 1, NULL),
+(262, 27, 57, 58, 159, 0, NULL),
+(263, 27, 57, 3, 36, 1, NULL),
+(264, 27, 57, 28, 136, 1, NULL),
+(265, 27, 57, 9, 61, 0, NULL),
+(266, 27, 57, 31, NULL, 1, 'http://localhost:5173/#/?exam_id_live=57'),
+(267, 27, 57, 45, NULL, 1, 'http://localhost:5173/#/?exam_id_live=57'),
+(268, 27, 57, 42, NULL, 0, 'http://localhost:5173/#/?exam_id_live=57'),
+(269, 27, 57, 36, NULL, 0, 'http://localhost:5173/#/?exam_id_live=57'),
+(270, 27, 60, 33, NULL, 1, 'http://localhost:5173/#/?exam_id_live=60http://localhost:5173/#/?exam_id_live=60http://localhost:5173/#/?exam_id_live=60\n\nhttp://localhost:5173/#/?exam_id_live=60'),
+(271, 27, 60, 13, 76, 1, NULL),
+(272, 27, 60, 45, NULL, 0, 'http://localhost:5173/#/?exam_id_live=60http://localhost:5173/#/?exam_id_live=60'),
+(273, 27, 60, 59, 162, 0, NULL),
+(274, 27, 60, 46, 1, 1, NULL),
+(275, 27, 60, 78, 200, 0, NULL),
+(276, 27, 58, 35, NULL, NULL, 'http://localhost:5173/#/?exam_id_live=59http://localhost:5173/#/?exam_id_live=59'),
+(277, 27, 58, 39, NULL, NULL, 'http://localhost:5173/#/?exam_id_live=59http://localhost:5173/#/?exam_id_live=59'),
+(278, 27, 58, 15, 84, 1, NULL),
+(279, 27, 58, 10, 66, 1, NULL),
+(280, 27, 58, 25, 126, 0, NULL),
+(281, 27, 58, 47, 4, 1, NULL),
+(282, 27, 59, 40, NULL, 1, 'http://localhost:5173/#/?exam_id_live=59http://localhost:5173/#/?exam_id_live=59'),
+(283, 27, 59, 25, 124, 1, NULL);
 
 --
 -- Index pour les tables déchargées
@@ -518,13 +629,13 @@ ALTER TABLE `useranswer`
 -- AUTO_INCREMENT pour la table `exam`
 --
 ALTER TABLE `exam`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT pour la table `exam_question`
 --
 ALTER TABLE `exam_question`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=456;
 
 --
 -- AUTO_INCREMENT pour la table `exam_status`
@@ -536,37 +647,37 @@ ALTER TABLE `exam_status`
 -- AUTO_INCREMENT pour la table `exam_user`
 --
 ALTER TABLE `exam_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT pour la table `exam_user_status`
 --
 ALTER TABLE `exam_user_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
 
 --
 -- AUTO_INCREMENT pour la table `question`
 --
 ALTER TABLE `question`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT pour la table `questionoption`
 --
 ALTER TABLE `questionoption`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=194;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT pour la table `useranswer`
 --
 ALTER TABLE `useranswer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=284;
 
 --
 -- Contraintes pour les tables déchargées

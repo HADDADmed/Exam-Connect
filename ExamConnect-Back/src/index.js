@@ -34,10 +34,11 @@ connection.connect(function (err) {
 });
 
 app.use("/api/questions", verifyAdmin, require("./routers/questions.router"));
-app.use("/api/users", verifyAdmin, require("./routers/users.router"));
-app.use("/api/exams", require("./routers/exams.router"));
-app.use("/api/userAnswers", require("./routers/userAnswers.router"));
-app.use("/api/auth", require("./routers/auth.router"));
+app.use("/api/users",verifyAdmin, require("./routers/users.router"));
+app.use("/api/exams",require("./routers/exams.router"));
+app.use("/api/userAnswers",require("./routers/userAnswers.router"));
+app.use("/api/auth",require("./routers/auth.router"));
+app.use("/api/dashboard",verifyAdmin,require("./routers/dashboard.router"));
 //
 
 //
