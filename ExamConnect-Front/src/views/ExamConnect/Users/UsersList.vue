@@ -4,6 +4,11 @@ export default {
      data() {
           return {
                users: [],
+               usersCount: 0,
+               usersFiltred: [],
+               usersFiltredCount: 0,
+               searchTerms: "",
+               orderSearch: false,
           };
      },
      mounted() {
@@ -13,6 +18,9 @@ export default {
           getUsers() {
                UsersService.getAllUsers().then((response) => {
                     this.users = response.data;
+                    this.usersFiltred = response.data;
+                    this.usersCount = response.data.length;
+                    this.usersFiltredCount = response.data.length;
                });
           },
           deleteUser(id) {
@@ -29,9 +37,27 @@ export default {
                          });
                     });
           },
+          searchByName(newVal) {
+               const terms = newVal.split(" ");
+               console.log(terms);
+               this.usersFiltred = this.users.filter((user) => {
+                    return terms.every((term) => {
+                         return (
+                              user.fullName.toLowerCase().includes(term) ||
+                              user.email.toLowerCase().includes(term)
+                         );
+                    });
+               });
+               this.usersFiltredCount = this.usersFiltred.length;
+          },
      },
      mounted() {
           this.getUsers();
+     },
+     watch: {
+          searchTerms(newVal) {
+               this.searchByName(newVal);
+          },
      },
 };
 </script>
@@ -57,7 +83,7 @@ export default {
      <!-- Page Content -->
      <div class="content">
           <BaseBlock
-               :title="`  User in Total`"
+               :title="`${usersCount} User in Total`"
                content-full
                class="animated zoomIn"
           >
@@ -132,6 +158,7 @@ export default {
                     <div
                          id="one-dashboard-search-orders"
                          class="block-content border-bottom"
+                         v-if="orderSearch"
                     >
                          <!-- Search Form -->
                          <form @submit.prevent>
@@ -142,7 +169,8 @@ export default {
                                              class="form-control form-control-alt"
                                              id="one-ecom-orders-search"
                                              name="one-ecom-orders-search"
-                                             placeholder="Search all orders.."
+                                             placeholder="Search Users By Name ..."
+                                             v-model="searchTerms"
                                         />
                                         <span
                                              class="input-group-text bg-body border-0"
@@ -157,7 +185,7 @@ export default {
                     <BaseBlock title="USERS LIST ">
                          <template #options>
                               <div class="block-options-item">
-                                   <code>{{ users.length }} user</code>
+                                   <code>{{ usersFiltredCount }} user</code>
                               </div>
                          </template>
 
@@ -181,7 +209,7 @@ export default {
                                    </tr>
                               </thead>
                               <tbody>
-                                   <tr v-for="user in users" :key="user.id">
+                                   <tr v-for="user in usersFiltred" :key="user.id">
                                         <th class="text-center" scope="row">
                                              {{ user.id }}
                                         </th>
