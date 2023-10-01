@@ -5,7 +5,6 @@ import { onMounted, reactive, ref } from "vue";
 import { Line, Pie } from "vue-chartjs";
 import { Chart, registerables } from "chart.js";
 import DashboardService from "@/services/dashboard.service.js";
-import UserService from "@/services/users.service.js";
 Chart.register(...registerables);
 // Set Global Chart.js configuration
 Chart.defaults.color = "#818d96";
@@ -19,18 +18,20 @@ Chart.defaults.elements.point.hoverRadius = 6;
 Chart.defaults.plugins.tooltip.radius = 3;
 Chart.defaults.plugins.legend.labels.boxWidth = 15;
 
+
+const showPassword = ref(false);
 var chartPolarPieDonutData = ref({
-     labels: ["", "", "",""],
+     labels: ["", "", "", ""],
      datasets: [
           {
-               data: ["", "", "",""],
-               backgroundColor: ["", "", "",""],
+               data: ["", "", "", ""],
+               backgroundColor: ["", "", "", ""],
                hoverBackgroundColor: ["", "", "", ""],
           },
      ],
 });
 
-var  chartPolarPieDonutDataquestions = ref({
+var chartPolarPieDonutDataquestions = ref({
      labels: ["", "", ""],
      datasets: [
           {
@@ -41,7 +42,7 @@ var  chartPolarPieDonutDataquestions = ref({
      ],
 });
 
- 
+
 // Helper variables
 const orderSearch = ref(false);
 
@@ -225,7 +226,7 @@ async function getExamsStatistics() {
                     ],
                };
 
-           });
+          });
      } catch (error) {
           console.log(error);
      }
@@ -238,7 +239,7 @@ async function getQuestionsStatistics() {
      try {
           DashboardService.getQuestionsStatistics().then((response) => {
                questionsStatistics.value = response.data.questionsStatistics;
-                 chartPolarPieDonutDataquestions.value = {
+               chartPolarPieDonutDataquestions.value = {
                     labels: ["MCQ Questions", "IMAGES Questions", "TEXT Questions"],
                     datasets: [
                          {
@@ -261,7 +262,7 @@ async function getQuestionsStatistics() {
                     ],
                };
 
-           });
+          });
      } catch (error) {
           console.log(error);
      }
@@ -272,10 +273,10 @@ async function getQuestionsStatistics() {
 let users = ref([]);
 async function getUsers() {
      try {
-          UserService.getAllUsers().then((response) => {
-               users.value = response.data;
+          DashboardService.getUsersStatistics().then((response) => {
+               users.value = response.data.users;
                console.log(users.value);
-           });
+          });
      } catch (error) {
           console.log(error);
      }
@@ -283,12 +284,12 @@ async function getUsers() {
 
 onMounted(() => {
      getExamsStatistics();
-    setTimeout(() => {
-        getQuestionsStatistics();
-        setTimeout(() => {
-            getUsers();
-        }, 1500);
-    }, 1500);
+     setTimeout(() => {
+          getQuestionsStatistics();
+          setTimeout(() => {
+               getUsers();
+          }, 1000);
+     }, 1500);
 });
 </script>
 
@@ -297,14 +298,11 @@ onMounted(() => {
           <!-- Hero -->
           <div class="content">
                <div
-                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
-               >
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
                     <div class="flex-grow-1 mb-1 mb-md-0">
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
                               Welcome
-                              <span style="color: red"
-                                   ><strong>ADMIM</strong></span
-                              >
+                              <span style="color: red"><strong>ADMIM</strong></span>
                               , everything looks great.
                          </h2>
                     </div>
@@ -317,8 +315,7 @@ onMounted(() => {
           <!-- Hero -->
           <div class="content">
                <div
-                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
-               >
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
                     <div class="flex-grow-1 mb-1 mb-md-0">
                          <h1 class="h3 fw-bold mb-2">Exams</h1>
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
@@ -326,57 +323,26 @@ onMounted(() => {
                          </h2>
                     </div>
                     <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
-                        
+
                          <div class="dropdown d-inline-block">
-                              <button
-                                   type="button"
-                                   class="btn btn-sm btn-alt-secondary space-x-1"
-                                   id="dropdown-analytics-overview"
-                                   data-bs-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false"
-                              >
-                                   <i
-                                        class="fa fa-fw fa-calendar-alt opacity-50"
-                                   ></i>
+                              <button type="button" class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview" data-bs-toggle="dropdown" aria-haspopup="true"
+                                   aria-expanded="false">
+                                   <i class="fa fa-fw fa-calendar-alt opacity-50"></i>
                                    <span>All time</span>
                                    <i class="fa fa-fw fa-angle-down"></i>
                               </button>
-                              <div
-                                   class="dropdown-menu dropdown-menu-end fs-sm"
-                                   aria-labelledby="dropdown-analytics-overview"
-                              >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 30 days</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last month</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 3 months</a
-                                   >
+                              <div class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview">
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 30 days</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last month</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 3 months</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >This year</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last Year</a
-                                   >
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">This year</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last Year</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                        href="javascript:void(0)"
-                                   >
+                                   <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)">
                                         <span>All time</span>
                                         <i class="fa fa-check"></i>
                                    </a>
@@ -398,36 +364,24 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
                                              <dt class="fs-3 fw-bold">{{ examsStatistics.notStarted }}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   User Exam Not Started
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-hourglass-start"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-hourglass-start"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
-                                             <span
-                                                  >View all the Not Started User
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
+                                             <span>View all the Not Started User
                                                   Exams
                                              </span>
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -439,36 +393,23 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
                                              <dt class="fs-3 fw-bold">{{ examsStatistics.pendingReview }}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   User Exam Pending your Review
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-hourglass-end"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-hourglass-end"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
-                                             <span
-                                                  >View all Pending Review User
-                                                  Exams</span
-                                             >
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
+                                             <span>View all Pending Review User
+                                                  Exams</span>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -480,33 +421,22 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
                                              <dt class="fs-3 fw-bold">{{ examsStatistics.totalExams }}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   User Exam In Total
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-chalkboard-user"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-chalkboard-user"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              <span>View all User Exams</span>
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -518,33 +448,22 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
                                              <dt class="fs-3 fw-bold">{{ examsStatistics.totalUserExams }}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   Exam in Total
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-chalkboard"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-chalkboard"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              <span>View All Exams</span>
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -560,28 +479,18 @@ onMounted(() => {
                          <!-- Earnings Summary -->
                          <BaseBlock class="flex-grow-1 d-flex flex-column">
                               <template #options>
-                                   <button
-                                        type="button"
-                                        class="btn-block-option"
-                                   >
+                                   <button type="button" class="btn-block-option">
                                         <i class="si si-settings"></i>
                                    </button>
                               </template>
 
                               <template #content>
                                    <!-- Pie Chart -->
-                                   <BaseBlock
-                                        content-full
-                                        content-class="text-center"
-                                   >
+                                   <BaseBlock content-full content-class="text-center">
                                         <div class="py-3 px-xxl-7">
-                                             <Pie
-                                                  :data="chartPolarPieDonutData"
-                                                  :options="{
-                                                       maintainAspectRatio: false,
-                                                  }"
-                                                  style="height: 350px"
-                                             />
+                                             <Pie :data="chartPolarPieDonutData" :options="{
+                                                  maintainAspectRatio: false,
+                                             }" style="height: 350px" />
                                         </div>
                                    </BaseBlock>
                               </template>
@@ -592,115 +501,68 @@ onMounted(() => {
                          <!-- Last 2 Weeks -->
                          <div class="row items-push flex-grow-1">
                               <div class="col-md-6 col-xl-12">
-                                   <BaseBlock
-                                        class="d-flex flex-column h-100 mb-0"
-                                   >
+                                   <BaseBlock class="d-flex flex-column h-100 mb-0">
                                         <template #content>
-                                             <div
-                                                  class="block-content flex-grow-1 d-flex justify-content-between"
-                                             >
+                                             <div class="block-content flex-grow-1 d-flex justify-content-between">
                                                   <dl class="mb-0">
                                                        <dt class="fs-3 fw-bold">
                                                             {{ examsStatistics.failed }}
-                                                            <i
-                                                                 class="fa-solid fa-circle-xmark"
-                                                                 style="
+                                                            <i class="fa-solid fa-circle-xmark" style="
                                                                       color: #ff0000;
-                                                                 "
-                                                            ></i>
+                                                                 "></i>
                                                        </dt>
-                                                       <dd
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
+                                                       <dd class="fs-sm fw-medium text-muted mb-0">
                                                             Total Failed Exams
                                                        </dd>
                                                   </dl>
                                                   <div></div>
                                              </div>
-                                             <div
-                                                  class="block-content p-1 text-center overflow-hidden"
-                                             >
-                                                  <Line
-                                                       :data="totalFailedExams"
-                                                       :options="
-                                                            totalFailedOptions
-                                                       "
-                                                       style="height: 90px"
-                                                  />
+                                             <div class="block-content p-1 text-center overflow-hidden">
+                                                  <Line :data="totalFailedExams" :options="totalFailedOptions
+                                                       " style="height: 90px" />
                                              </div>
 
-                                             <div
-                                                  class="bg-body-light rounded-bottom"
-                                             >
-                                                  <a
-                                                       class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                                       href="javascript:void(0)"
-                                                  >
-                                                       <span
-                                                            >View all The Failed
+                                             <div class="bg-body-light rounded-bottom">
+                                                  <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                                       href="javascript:void(0)">
+                                                       <span>View all The Failed
                                                             Exams
                                                        </span>
-                                                       <i
-                                                            class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                                       ></i>
+                                                       <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                                   </a>
                                              </div>
                                         </template>
                                    </BaseBlock>
                               </div>
                               <div class="col-md-6 col-xl-12">
-                                   <BaseBlock
-                                        class="d-flex flex-column h-100 mb-0"
-                                   >
+                                   <BaseBlock class="d-flex flex-column h-100 mb-0">
                                         <template #content>
-                                             <div
-                                                  class="block-content flex-grow-1 d-flex justify-content-between"
-                                             >
+                                             <div class="block-content flex-grow-1 d-flex justify-content-between">
                                                   <dl class="mb-0">
                                                        <dt class="fs-3 fw-bold">
                                                             {{ examsStatistics.passed }}
-                                                            <i
-                                                                 class="fa-solid fa-circle-check"
-                                                                 style="
+                                                            <i class="fa-solid fa-circle-check" style="
                                                                       color: #59ff00;
-                                                                 "
-                                                            ></i>
+                                                                 "></i>
                                                        </dt>
-                                                       <dd
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
+                                                       <dd class="fs-sm fw-medium text-muted mb-0">
                                                             Total Passed Exams
                                                        </dd>
                                                   </dl>
                                                   <div></div>
                                              </div>
-                                             <div
-                                                  class="block-content p-1 text-center overflow-hidden"
-                                             >
-                                                  <Line
-                                                       :data="
-                                                            totalPassedExamsData
-                                                       "
-                                                       :options="
-                                                            totalPassedExamsOptions
-                                                       "
-                                                       style="height: 90px"
-                                                  />
+                                             <div class="block-content p-1 text-center overflow-hidden">
+                                                  <Line :data="totalPassedExamsData
+                                                       " :options="totalPassedExamsOptions
+          " style="height: 90px" />
                                              </div>
-                                             <div
-                                                  class="bg-body-light rounded-bottom"
-                                             >
-                                                  <a
-                                                       class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                                       href="javascript:void(0)"
-                                                  >
-                                                       <span
-                                                            >View all the Passed
+                                             <div class="bg-body-light rounded-bottom">
+                                                  <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                                       href="javascript:void(0)">
+                                                       <span>View all the Passed
                                                             Exams
                                                        </span>
-                                                       <i
-                                                            class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                                       ></i>
+                                                       <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                                   </a>
                                              </div>
                                         </template>
@@ -718,8 +580,7 @@ onMounted(() => {
           <!-- Hero -->
           <div class="content">
                <div
-                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
-               >
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
                     <div class="flex-grow-1 mb-1 mb-md-0">
                          <h1 class="h3 fw-bold mb-2">Questions</h1>
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
@@ -727,57 +588,26 @@ onMounted(() => {
                          </h2>
                     </div>
                     <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
-                         
+
                          <div class="dropdown d-inline-block">
-                              <button
-                                   type="button"
-                                   class="btn btn-sm btn-alt-secondary space-x-1"
-                                   id="dropdown-analytics-overview"
-                                   data-bs-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false"
-                              >
-                                   <i
-                                        class="fa fa-fw fa-calendar-alt opacity-50"
-                                   ></i>
+                              <button type="button" class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview" data-bs-toggle="dropdown" aria-haspopup="true"
+                                   aria-expanded="false">
+                                   <i class="fa fa-fw fa-calendar-alt opacity-50"></i>
                                    <span>All time</span>
                                    <i class="fa fa-fw fa-angle-down"></i>
                               </button>
-                              <div
-                                   class="dropdown-menu dropdown-menu-end fs-sm"
-                                   aria-labelledby="dropdown-analytics-overview"
-                              >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 30 days</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last month</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 3 months</a
-                                   >
+                              <div class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview">
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 30 days</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last month</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 3 months</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >This year</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last Year</a
-                                   >
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">This year</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last Year</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                        href="javascript:void(0)"
-                                   >
+                                   <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)">
                                         <span>All time</span>
                                         <i class="fa fa-check"></i>
                                    </a>
@@ -799,36 +629,23 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
-                                             <dt class="fs-3 fw-bold">{{questionsStatistics.qcmQuestions}}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dt class="fs-3 fw-bold">{{ questionsStatistics.qcmQuestions }}</dt>
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   MCQ (QCM) Questions
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-circle-question"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-circle-question"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
-                                             <span
-                                                  >View all MCQ (QCM)
-                                                  Questions</span
-                                             >
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
+                                             <span>View all MCQ (QCM)
+                                                  Questions</span>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -840,33 +657,23 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
-                                             <dt class="fs-3 fw-bold">{{questionsStatistics.textQuestions}}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dt class="fs-3 fw-bold">{{ questionsStatistics.textQuestions }}</dt>
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   Text Questions
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
+                                        <div class="item item-rounded-lg bg-body-light">
                                              <i class="fa-solid fa-pencil"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
-                                             <span
-                                                  >View all the Text Questions
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
+                                             <span>View all the Text Questions
                                              </span>
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -878,36 +685,23 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
-                                             <dt class="fs-3 fw-bold">{{questionsStatistics.imgQuestions}}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dt class="fs-3 fw-bold">{{ questionsStatistics.imgQuestions }}</dt>
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   Image Questions
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa-solid fa-circle-question"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa-solid fa-circle-question"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
-                                             <span
-                                                  >View all Images
-                                                  Questions</span
-                                             >
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
+                                             <span>View all Images
+                                                  Questions</span>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -919,33 +713,22 @@ onMounted(() => {
                          <BaseBlock class="d-flex flex-column h-100 mb-0">
                               <template #content>
                                    <div
-                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-                                   >
+                                        class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                                         <dl class="mb-0">
                                              <dt class="fs-3 fw-bold">{{ questionsStatistics.total_questions }}</dt>
-                                             <dd
-                                                  class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0"
-                                             >
+                                             <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
                                                   Questions in Total
                                              </dd>
                                         </dl>
-                                        <div
-                                             class="item item-rounded-lg bg-body-light"
-                                        >
-                                             <i
-                                                  class="fa fa-chart-bar fs-3 text-primary"
-                                             ></i>
+                                        <div class="item item-rounded-lg bg-body-light">
+                                             <i class="fa fa-chart-bar fs-3 text-primary"></i>
                                         </div>
                                    </div>
                                    <div class="bg-body-light rounded-bottom">
-                                        <a
-                                             class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              <span>View statistics</span>
-                                             <i
-                                                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                                             ></i>
+                                             <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                                         </a>
                                    </div>
                               </template>
@@ -963,29 +746,18 @@ onMounted(() => {
                          <!-- Earnings Summary -->
                          <BaseBlock class="flex-grow-1 d-flex flex-column">
                               <template #options>
-                                   <button
-                                        type="button"
-                                        class="btn-block-option"
-                                   >
+                                   <button type="button" class="btn-block-option">
                                         <i class="si si-settings"></i>
                                    </button>
                               </template>
 
                               <template #content>
-                                   <BaseBlock
-                                        content-full
-                                        content-class="text-center"
-                                   >
+                                   <BaseBlock content-full content-class="text-center">
                                         <div class="py-3 px-xxl-7">
-                                             <Pie
-                                                  :data="
-                                                       chartPolarPieDonutDataquestions
-                                                  "
-                                                  :options="{
-                                                       maintainAspectRatio: false,
-                                                  }"
-                                                  style="height: 350px"
-                                             />
+                                             <Pie :data="chartPolarPieDonutDataquestions
+                                                  " :options="{
+          maintainAspectRatio: false,
+     }" style="height: 350px" />
                                         </div>
                                    </BaseBlock>
                               </template>
@@ -1002,8 +774,7 @@ onMounted(() => {
           <!-- Hero -->
           <div class="content">
                <div
-                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start"
-               >
+                    class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center py-2 text-center text-md-start">
                     <div class="flex-grow-1 mb-1 mb-md-0">
                          <h1 class="h3 fw-bold mb-2">Users</h1>
                          <h2 class="h6 fw-medium fw-medium text-muted mb-0">
@@ -1011,63 +782,29 @@ onMounted(() => {
                          </h2>
                     </div>
                     <div class="mt-3 mt-md-0 ms-md-3 space-x-1">
-                         <a
-                              href="javascript:void(0)"
-                              class="btn btn-sm btn-alt-secondary space-x-1"
-                         >
+                         <a href="javascript:void(0)" class="btn btn-sm btn-alt-secondary space-x-1">
                               <i class="fa fa-cogs opacity-50"></i>
                               <span>Settings</span>
                          </a>
                          <div class="dropdown d-inline-block">
-                              <button
-                                   type="button"
-                                   class="btn btn-sm btn-alt-secondary space-x-1"
-                                   id="dropdown-analytics-overview"
-                                   data-bs-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false"
-                              >
-                                   <i
-                                        class="fa fa-fw fa-calendar-alt opacity-50"
-                                   ></i>
+                              <button type="button" class="btn btn-sm btn-alt-secondary space-x-1"
+                                   id="dropdown-analytics-overview" data-bs-toggle="dropdown" aria-haspopup="true"
+                                   aria-expanded="false">
+                                   <i class="fa fa-fw fa-calendar-alt opacity-50"></i>
                                    <span>All time</span>
                                    <i class="fa fa-fw fa-angle-down"></i>
                               </button>
-                              <div
-                                   class="dropdown-menu dropdown-menu-end fs-sm"
-                                   aria-labelledby="dropdown-analytics-overview"
-                              >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 30 days</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last month</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last 3 months</a
-                                   >
+                              <div class="dropdown-menu dropdown-menu-end fs-sm"
+                                   aria-labelledby="dropdown-analytics-overview">
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 30 days</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last month</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last 3 months</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >This year</a
-                                   >
-                                   <a
-                                        class="dropdown-item fw-medium"
-                                        href="javascript:void(0)"
-                                        >Last Year</a
-                                   >
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">This year</a>
+                                   <a class="dropdown-item fw-medium" href="javascript:void(0)">Last Year</a>
                                    <div class="dropdown-divider"></div>
-                                   <a
-                                        class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                        href="javascript:void(0)"
-                                   >
+                                   <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                        href="javascript:void(0)">
                                         <span>All time</span>
                                         <i class="fa fa-check"></i>
                                    </a>
@@ -1082,76 +819,44 @@ onMounted(() => {
      <div class="content">
           <div class="users">
                <!-- Recent Orders -->
-               <BaseBlock title="Recent Orders">
+               <BaseBlock title="Users">
                     <template #options>
                          <div class="space-x-1">
-                              <button
-                                   type="button"
-                                   class="btn btn-sm btn-alt-secondary"
-                                   @click="
-                                        () => {
-                                             orderSearch = !orderSearch;
-                                        }
-                                   "
-                              >
+                              <button type="button" class="btn btn-sm btn-alt-secondary" @click="() => {
+                                   orderSearch = !orderSearch;
+                              }
+                                   ">
                                    <i class="fa fa-search"></i>
                               </button>
                               <div class="dropdown d-inline-block">
-                                   <button
-                                        type="button"
-                                        class="btn btn-sm btn-alt-secondary"
-                                        id="dropdown-recent-orders-filters"
-                                        data-bs-toggle="dropdown"
-                                        aria-haspopup="true"
-                                        aria-expanded="false"
-                                   >
+                                   <button type="button" class="btn btn-sm btn-alt-secondary"
+                                        id="dropdown-recent-orders-filters" data-bs-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
                                         <i class="fa fa-fw fa-flask"></i>
                                         Filters
                                         <i class="fa fa-angle-down ms-1"></i>
                                    </button>
-                                   <div
-                                        class="dropdown-menu dropdown-menu-md dropdown-menu-end fs-sm"
-                                        aria-labelledby="dropdown-recent-orders-filters"
-                                   >
-                                        <a
-                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                   <div class="dropdown-menu dropdown-menu-md dropdown-menu-end fs-sm"
+                                        aria-labelledby="dropdown-recent-orders-filters">
+                                        <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              Pending
-                                             <span
-                                                  class="badge bg-primary rounded-pill"
-                                                  >20</span
-                                             >
+                                             <span class="badge bg-primary rounded-pill">20</span>
                                         </a>
-                                        <a
-                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              Active
-                                             <span
-                                                  class="badge bg-primary rounded-pill"
-                                                  >72</span
-                                             >
+                                             <span class="badge bg-primary rounded-pill">72</span>
                                         </a>
-                                        <a
-                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              Completed
-                                             <span
-                                                  class="badge bg-primary rounded-pill"
-                                                  >890</span
-                                             >
+                                             <span class="badge bg-primary rounded-pill">890</span>
                                         </a>
-                                        <a
-                                             class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
-                                             href="javascript:void(0)"
-                                        >
+                                        <a class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                                             href="javascript:void(0)">
                                              All
-                                             <span
-                                                  class="badge bg-primary rounded-pill"
-                                                  >997</span
-                                             >
+                                             <span class="badge bg-primary rounded-pill">997</span>
                                         </a>
                                    </div>
                               </div>
@@ -1159,25 +864,15 @@ onMounted(() => {
                     </template>
 
                     <template #content>
-                         <div
-                              v-if="orderSearch"
-                              id="one-dashboard-search-orders"
-                              class="block-content border-bottom"
-                         >
+                         <div v-if="orderSearch" id="one-dashboard-search-orders" class="block-content border-bottom">
                               <!-- Search Form -->
                               <form @submit.prevent>
                                    <div class="push">
                                         <div class="input-group">
-                                             <input
-                                                  type="text"
-                                                  class="form-control form-control-alt"
-                                                  id="one-ecom-orders-search"
-                                                  name="one-ecom-orders-search"
-                                                  placeholder="Search all orders.."
-                                             />
-                                             <span
-                                                  class="input-group-text bg-body border-0"
-                                             >
+                                             <input type="text" class="form-control form-control-alt"
+                                                  id="one-ecom-orders-search" name="one-ecom-orders-search"
+                                                  placeholder="Search all orders.." />
+                                             <span class="input-group-text bg-body border-0">
                                                   <i class="fa fa-search"></i>
                                              </span>
                                         </div>
@@ -1188,583 +883,80 @@ onMounted(() => {
                          <div class="block-content block-content-full">
                               <!-- Recent Orders Table -->
                               <div class="table-responsive">
-                                   <table
-                                        class="table table-hover table-vcenter"
-                                   >
+                                   <table class="table table-hover table-vcenter">
                                         <thead>
                                              <tr>
-                                                  <th>Order ID</th>
-                                                  <th
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       Customer
+                                                  <th class="text-center" style="width: 100px">
+                                                       <i class="far fa-user"></i>
                                                   </th>
-                                                  <th>Status</th>
-                                                  <th
-                                                       class="d-none d-sm-table-cell text-center"
-                                                  >
-                                                       Profit
+                                                  <th>#ID</th>
+                                                  <th class=" d-xl-table-cell">
+                                                       Full Name
                                                   </th>
-                                                  <th
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
+                                                  <th class="d-none d-xl-table-cell">
+                                                       Email
+                                                  </th>
+                                                   <th class="d-none d-sm-table-cell ">
+                                                       Total exams
+                                                  </th>
+                                                  <th class="d-none d-sm-table-cell ">
+                                                       password
+                                                  </th>
+                                                  <th class="d-none d-sm-table-cell text-center">
                                                        Created
                                                   </th>
-                                                  <th
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       Value
-                                                  </th>
+
                                              </tr>
                                         </thead>
                                         <tbody class="fs-sm">
-                                             <tr>
+                                             <tr v-for="user in users" >
+                                                  <td class="text-center">
+                                                       <img class="img-avatar img-avatar48"
+                                                            :src="`/assets/media/avatars/avatar0.jpg`" alt="Avatar" />
+                                                  </td>
                                                   <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00925
+                                                       <a class="fw-bold " href="javascript:void(0)">
+                                                            #{{user.id}}
                                                        </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
+
                                                   </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Marie Duncan</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Photographer
-                                                       </p>
+                                                  <td class="d-none d-xl-table-cell">
+                                                       <a class="fw-bold" href="javascript:void(0)">{{user.fullName}}</a>
                                                   </td>
                                                   <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
-                                                            >Completed</span
-                                                       >
+                                                       {{ user.email }}
                                                   </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 8%;
-                                                                 "
-                                                                 aria-valuenow="8"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
+
+                                                  <td class="d-none d-sm-table-cell " style="font-size: 20px;">
+                                                       <span class="badge badge-lg bg-primary rounded rounded-pill " style="margin-left:10px;"  > {{user.total_user_exams}}</span>
+                                                  </td>
+                                                  <td class="d-none d-sm-table-cell " style="font-size: 20px;">
+                                                        <div style="cursor:pointer;"  v-if="!showPassword" class="d-flex ">
+                                                            <div style="margin: 0px 5px 0px 0px; font-size:20px;">
+                                                                 <span v-for="n in user.password.length">*</span>
+                                                            </div>
+                                                            <!--eye icon -->
+                                                            <i @click="showPassword = !showPassword" style="font-size:25px;" class="fa fa-eye" ></i>
+                                                        </div>
+                                                        <div v-else class="d-flex ">
+                                                            <div style="margin: -2px 5px 0px 0px; font-size:18px;">
+                                                                <span >{{user.password}}</span>
+                                                             </div>
+                                                            <!--eye-slash icon -->
+                                                            <i @click="showPassword = !showPassword"  style="font-size:25px;"  class="fa fa-eye-slash" ></i>
                                                        </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            8%
-                                                       </p>
                                                   </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       7 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$786,81</strong>
+                                                  <td class="d-none d-sm-table-cell  text-center">
+                                                       <strong>{{globalService.getfullDateTime(user.createdAt)}}</strong>
                                                   </td>
                                              </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00924
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Jack Estrada</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Photographer
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-info-light text-info"
-                                                            >Active</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 6%;
-                                                                 "
-                                                                 aria-valuenow="6"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            6%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       26 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$1184,20</strong>
-                                                  </td>
-                                             </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00923
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Megan Fuller</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Web developer
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
-                                                            >Completed</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 25%;
-                                                                 "
-                                                                 aria-valuenow="25"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            25%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       19 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$2379,44</strong>
-                                                  </td>
-                                             </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00922
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Lisa Jenkins</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Application Manager
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning-light text-warning"
-                                                            >Pending</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 18%;
-                                                                 "
-                                                                 aria-valuenow="18"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            18%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       13 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$458,52</strong>
-                                                  </td>
-                                             </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00921
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Brian Stevens</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Photographer
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success"
-                                                            >Completed</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 10%;
-                                                                 "
-                                                                 aria-valuenow="10"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            10%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       4 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$476,82</strong>
-                                                  </td>
-                                             </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00920
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Jesse Fisher</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Digital Nomad
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-warning-light text-warning"
-                                                            >Pending</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 23%;
-                                                                 "
-                                                                 aria-valuenow="23"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            23%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       23 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$1939,58</strong>
-                                                  </td>
-                                             </tr>
-                                             <tr>
-                                                  <td>
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                       >
-                                                            ORD.00919
-                                                       </a>
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Premium
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-xl-table-cell"
-                                                  >
-                                                       <a
-                                                            class="fw-semibold"
-                                                            href="javascript:void(0)"
-                                                            >Carol Ray</a
-                                                       >
-                                                       <p
-                                                            class="fs-sm fw-medium text-muted mb-0"
-                                                       >
-                                                            Web developer
-                                                       </p>
-                                                  </td>
-                                                  <td>
-                                                       <span
-                                                            class="fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-info-light text-info"
-                                                            >Active</span
-                                                       >
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell"
-                                                  >
-                                                       <div
-                                                            class="progress mb-1"
-                                                            style="height: 5px"
-                                                       >
-                                                            <div
-                                                                 class="progress-bar bg-success"
-                                                                 role="progressbar"
-                                                                 style="
-                                                                      width: 14%;
-                                                                 "
-                                                                 aria-valuenow="14"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100"
-                                                            ></div>
-                                                       </div>
-                                                       <p
-                                                            class="fs-xs fw-semibold mb-0"
-                                                       >
-                                                            14%
-                                                       </p>
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell fw-semibold text-muted text-end"
-                                                  >
-                                                       15 min ago
-                                                  </td>
-                                                  <td
-                                                       class="d-none d-sm-table-cell text-end"
-                                                  >
-                                                       <strong>$2200,10</strong>
-                                                  </td>
-                                             </tr>
+
                                         </tbody>
                                    </table>
                               </div>
                               <!-- END Recent Orders Table -->
                          </div>
-                         <div
-                              class="block-content block-content-full bg-body-light"
-                         >
-                              <!-- Pagination -->
-                              <nav aria-label="Photos Search Navigation">
-                                   <ul
-                                        class="pagination pagination-sm justify-content-end mb-0"
-                                   >
-                                        <li class="page-item">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  tabindex="-1"
-                                                  aria-label="Previous"
-                                             >
-                                                  Prev
-                                             </a>
-                                        </li>
-                                        <li class="page-item active">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  >1</a
-                                             >
-                                        </li>
-                                        <li class="page-item">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  >2</a
-                                             >
-                                        </li>
-                                        <li class="page-item">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  >3</a
-                                             >
-                                        </li>
-                                        <li class="page-item">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  >4</a
-                                             >
-                                        </li>
-                                        <li class="page-item">
-                                             <a
-                                                  class="page-link"
-                                                  href="javascript:void(0)"
-                                                  aria-label="Next"
-                                             >
-                                                  Next
-                                             </a>
-                                        </li>
-                                   </ul>
-                              </nav>
-                              <!-- END Pagination -->
-                         </div>
+
                     </template>
                </BaseBlock>
                <!-- END Recent Orders -->

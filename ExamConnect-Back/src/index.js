@@ -4,12 +4,6 @@ const verifyAdmin = require("./middlewares/verifyAdmin");
 const connection = require("./DataBaseConf/MySqlConnection");
 const app = express();
 const cors = require("cors"); // Import the cors package
-const allowedOrigins = [
-     "http://localhost:3000/",
-     "http://192.168.1.106:5173",
-     "http://localhost:5173",
-     "http://localhost:5174",
-];
 const PORT = process.env.SERVER_PORT || 3000;
 
 require("dotenv").config();
@@ -23,7 +17,6 @@ app.use(
           },
      })
 );
-
 // check if the DataBase is connected successfully
 connection.connect(function (err) {
      if (err) throw err;
