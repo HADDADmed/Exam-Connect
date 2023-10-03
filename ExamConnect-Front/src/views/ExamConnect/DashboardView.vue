@@ -19,7 +19,8 @@ Chart.defaults.plugins.tooltip.radius = 3;
 Chart.defaults.plugins.legend.labels.boxWidth = 15;
 
 
-const showPassword = ref(false);
+const showPassword = ref([]);
+
 var chartPolarPieDonutData = ref({
      labels: ["", "", "", ""],
      datasets: [
@@ -275,8 +276,10 @@ async function getUsers() {
      try {
           DashboardService.getUsersStatistics().then((response) => {
                users.value = response.data.users;
-               console.log(users.value);
-          });
+               users.value.forEach((row) => {
+                    showPassword.value.push(false);
+               });
+           });
      } catch (error) {
           console.log(error);
      }
@@ -909,7 +912,8 @@ onMounted(() => {
                                              </tr>
                                         </thead>
                                         <tbody class="fs-sm">
-                                             <tr v-for="user in users" >
+                                             <!-- tr with a loop and index-->
+                                             <tr v-for="(user,index) in users" :key="index">
                                                   <td class="text-center">
                                                        <img class="img-avatar img-avatar48"
                                                             :src="`/assets/media/avatars/avatar0.jpg`" alt="Avatar" />
@@ -931,19 +935,19 @@ onMounted(() => {
                                                        <span class="badge badge-lg bg-primary rounded rounded-pill " style="margin-left:10px;"  > {{user.total_user_exams}}</span>
                                                   </td>
                                                   <td class="d-none d-sm-table-cell " style="font-size: 20px;">
-                                                        <div style="cursor:pointer;"  v-if="!showPassword" class="d-flex ">
+                                                        <div style="cursor:pointer;"  v-if="!showPassword[index]" class="d-flex ">
                                                             <div style="margin: 0px 5px 0px 0px; font-size:20px;">
                                                                  <span v-for="n in user.password.length">*</span>
                                                             </div>
                                                             <!--eye icon -->
-                                                            <i @click="showPassword = !showPassword" style="font-size:25px;" class="fa fa-eye" ></i>
+                                                            <i @click="showPassword[index] = !showPassword[index]" style="font-size:25px;" class="fa fa-eye" ></i>
                                                         </div>
-                                                        <div v-else class="d-flex ">
+                                                        <div style="cursor:pointer;"  v-else class="d-flex ">
                                                             <div style="margin: -2px 5px 0px 0px; font-size:18px;">
                                                                 <span >{{user.password}}</span>
                                                              </div>
                                                             <!--eye-slash icon -->
-                                                            <i @click="showPassword = !showPassword"  style="font-size:25px;"  class="fa fa-eye-slash" ></i>
+                                                            <i @click="showPassword[index] = !showPassword[index]"  style="font-size:25px;"  class="fa fa-eye-slash" ></i>
                                                        </div>
                                                   </td>
                                                   <td class="d-none d-sm-table-cell  text-center">
